@@ -25,7 +25,7 @@ export default function TrackSearchPage() {
     router.push(`/track/${cleanRef}`);
   };
 
-  const sampleRefs = ['MK-2026-104829', 'MK-2026-209144', 'MK-2026-319082'];
+  const sampleRefs = ['MK2-2026-NH48-001', 'MK2-2026-RAIL-002', 'MK2-2026-JAL-003'];
 
   const [userComplaints, setUserComplaints] = useState<any[]>([]);
 

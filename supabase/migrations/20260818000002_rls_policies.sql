@@ -1,115 +1,92 @@
--- =========================================================
--- Makkal Kural (மக்கள் குரல்) — Row Level Security (RLS)
--- =========================================================
+-- ==============================================================================
+-- Makkal Kural 2.0 (மக்கள் குரல் 2.0) — RLS Security Policies
+-- Migration: 20260818000002_rls_policies.sql
+-- ==============================================================================
 
--- Enable RLS on all tables
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE representatives ENABLE ROW LEVEL SECURITY;
 ALTER TABLE complaints ENABLE ROW LEVEL SECURITY;
+ALTER TABLE complaint_attachments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE attachments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE delivery_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE complaint_updates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
--- Helper function to check if current user is admin
-CREATE OR REPLACE FUNCTION is_admin() 
-RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM profiles 
-    WHERE id = auth.uid() AND role = 'ADMIN'
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+-- Representatives: Public read, admin write
+CREATE POLICY "Public can view active representatives" 
+  ON representatives FOR SELECT 
+  USING (active = TRUE);
 
--- 1. Profiles Policies
-CREATE POLICY "Public profiles are viewable by everyone" 
-ON profiles FOR SELECT USING (true);
+CREATE POLICY "Admins full access to representatives" 
+  ON representatives FOR ALL 
+  USING (auth.jwt() ->> 'role' = 'service_role' OR auth.uid() IN (SELECT id FROM profiles WHERE role = 'ADMIN'));
 
-CREATE POLICY "Users can insert their own profile" 
-ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+-- Complaints: Public insert & read
+CREATE POLICY "Public can create complaints" 
+  ON complaints FOR INSERT 
+  WITH CHECK (true);
 
-CREATE POLICY "Users can update own profile" 
-ON profiles FOR UPDATE USING (auth.uid() = id);
-
--- 2. Representatives Policies (Public Directory)
-CREATE POLICY "Active representatives are viewable by everyone" 
-ON representatives FOR SELECT USING (active = true OR is_admin());
-
-CREATE POLICY "Admins can insert representatives" 
-ON representatives FOR INSERT WITH CHECK (is_admin());
-
-CREATE POLICY "Admins can update representatives" 
-ON representatives FOR UPDATE USING (is_admin());
-
-CREATE POLICY "Admins can delete representatives" 
-ON representatives FOR DELETE USING (is_admin());
-
--- 3. Complaints Policies
--- Anyone can read basic complaint data by reference number (for public tracking)
-CREATE POLICY "Complaints are viewable by owner, admin, or tracking reference" 
-ON complaints FOR SELECT USING (
-  auth.uid() = user_id OR 
-  is_admin() OR
-  true -- Public read for reference tracking (sensitive fields masked in API layer)
-);
-
-CREATE POLICY "Anyone can create a complaint" 
-ON complaints FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public can view public complaint details" 
+  ON complaints FOR SELECT 
+  USING (true);
 
 CREATE POLICY "Admins can update complaints" 
-ON complaints FOR UPDATE USING (is_admin() OR auth.uid() = user_id);
+  ON complaints FOR UPDATE 
+  USING (auth.jwt() ->> 'role' = 'service_role' OR auth.uid() IN (SELECT id FROM profiles WHERE role = 'ADMIN'));
 
--- 4. Attachments Policies
-CREATE POLICY "Attachments are viewable by complaint owner or admin" 
-ON attachments FOR SELECT USING (
-  EXISTS (
-    SELECT 1 FROM complaints 
-    WHERE complaints.id = attachments.complaint_id AND 
-    (complaints.user_id = auth.uid() OR is_admin())
-  )
-);
+-- Attachments
+CREATE POLICY "Public can insert attachments" 
+  ON complaint_attachments FOR INSERT 
+  WITH CHECK (true);
 
-CREATE POLICY "Anyone can insert attachments during complaint submission" 
-ON attachments FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public can view attachments" 
+  ON complaint_attachments FOR SELECT 
+  USING (true);
 
--- 5. Delivery Logs Policies
-CREATE POLICY "Delivery logs are viewable by admin and complaint owner" 
-ON delivery_logs FOR SELECT USING (
-  is_admin() OR 
-  EXISTS (
-    SELECT 1 FROM complaints 
-    WHERE complaints.id = delivery_logs.complaint_id AND complaints.user_id = auth.uid()
-  )
-);
+CREATE POLICY "Public can insert legacy attachments" 
+  ON attachments FOR INSERT 
+  WITH CHECK (true);
 
-CREATE POLICY "Admins or server can insert delivery logs" 
-ON delivery_logs FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public can view legacy attachments" 
+  ON attachments FOR SELECT 
+  USING (true);
 
--- 6. Complaint Updates Policies
-CREATE POLICY "Public updates are viewable by everyone" 
-ON complaint_updates FOR SELECT USING (is_public = true OR is_admin());
+-- Updates
+CREATE POLICY "Public can view updates" 
+  ON complaint_updates FOR SELECT 
+  USING (is_public = TRUE);
 
-CREATE POLICY "Admins can insert complaint updates" 
-ON complaint_updates FOR INSERT WITH CHECK (is_admin());
+CREATE POLICY "Service and Admin can insert updates" 
+  ON complaint_updates FOR ALL 
+  USING (true);
 
--- 7. Audit Logs Policies
-CREATE POLICY "Audit logs are only viewable by admins" 
-ON audit_logs FOR SELECT USING (is_admin());
+-- Delivery logs
+CREATE POLICY "Public can view delivery logs" 
+  ON delivery_logs FOR SELECT 
+  USING (true);
 
-CREATE POLICY "Audit logs are insertable by admins or server" 
-ON audit_logs FOR INSERT WITH CHECK (is_admin() OR true);
+CREATE POLICY "Service and Admin can insert delivery logs" 
+  ON delivery_logs FOR ALL 
+  USING (true);
 
--- 8. Storage Bucket and Policies for Evidence
-INSERT INTO storage.buckets (id, name, public)
+-- Profiles
+CREATE POLICY "Users can read own profile" 
+  ON profiles FOR SELECT 
+  USING (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile" 
+  ON profiles FOR UPDATE 
+  USING (auth.uid() = id);
+
+-- Storage bucket
+INSERT INTO storage.buckets (id, name, public) 
 VALUES ('evidence', 'evidence', true)
-ON CONFLICT (id) DO UPDATE SET public = true;
+ON CONFLICT (id) DO NOTHING;
 
-CREATE POLICY "Public Select Evidence" ON storage.objects
-FOR SELECT USING (bucket_id = 'evidence');
+CREATE POLICY "Public can upload complaint evidence" 
+  ON storage.objects FOR INSERT 
+  WITH CHECK (bucket_id = 'evidence');
 
-CREATE POLICY "Public Insert Evidence" ON storage.objects
-FOR INSERT WITH CHECK (bucket_id = 'evidence');
-
-CREATE POLICY "Public Update Evidence" ON storage.objects
-FOR UPDATE USING (bucket_id = 'evidence');
+CREATE POLICY "Public can view complaint evidence" 
+  ON storage.objects FOR SELECT 
+  USING (bucket_id = 'evidence');

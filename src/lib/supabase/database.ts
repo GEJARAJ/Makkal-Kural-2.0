@@ -7,7 +7,25 @@ function getDb() {
   return supabaseAdmin || supabase;
 }
 
-export async function getRepresentatives(filters?: { district?: string; verification?: string; search?: string }): Promise<Representative[]> {
+export interface RepresentativeFilters {
+  state?: string;
+  district?: string;
+  ministry?: string;
+  level?: string;
+  verification?: string;
+  search?: string;
+}
+
+export interface ComplaintFilters {
+  state?: string;
+  district?: string;
+  category?: string;
+  ministry?: string;
+  status?: string;
+  search?: string;
+}
+
+export async function getRepresentatives(filters?: RepresentativeFilters): Promise<Representative[]> {
   const client = getDb();
   if (!isSupabaseConfigured || !client) {
     return filterReps(mockStore.getRepresentatives(), filters);
@@ -15,15 +33,24 @@ export async function getRepresentatives(filters?: { district?: string; verifica
 
   try {
     let query = client.from('representatives').select('*').eq('active', true);
+    if (filters?.state && filters.state !== 'all') {
+      query = query.ilike('state', `%${filters.state}%`);
+    }
     if (filters?.district && filters.district !== 'all') {
       query = query.ilike('district', filters.district);
+    }
+    if (filters?.ministry && filters.ministry !== 'all') {
+      query = query.ilike('ministry', `%${filters.ministry}%`);
+    }
+    if (filters?.level && filters.level !== 'all') {
+      query = query.eq('level', filters.level);
     }
     if (filters?.verification && filters.verification !== 'all') {
       query = query.eq('verification_status', filters.verification);
     }
     if (filters?.search) {
       const q = `%${filters.search}%`;
-      query = query.or(`name.ilike.${q},organization.ilike.${q},role.ilike.${q},district.ilike.${q}`);
+      query = query.or(`name.ilike.${q},organization.ilike.${q},role.ilike.${q},district.ilike.${q},ministry.ilike.${q}`);
     }
     const { data, error } = await query.order('created_at', { ascending: false });
     if (error || !data || data.length === 0) {
@@ -35,10 +62,19 @@ export async function getRepresentatives(filters?: { district?: string; verifica
   }
 }
 
-function filterReps(reps: Representative[], filters?: { district?: string; verification?: string; search?: string }): Representative[] {
+function filterReps(reps: Representative[], filters?: RepresentativeFilters): Representative[] {
   let list = reps.filter(r => r.active);
+  if (filters?.state && filters.state !== 'all') {
+    list = list.filter(r => r.state.toLowerCase().includes(filters.state!.toLowerCase()) || r.state.toLowerCase() === 'all india');
+  }
   if (filters?.district && filters.district !== 'all') {
     list = list.filter(r => r.district.toLowerCase() === filters.district!.toLowerCase());
+  }
+  if (filters?.ministry && filters.ministry !== 'all') {
+    list = list.filter(r => (r.ministry || '').toLowerCase().includes(filters.ministry!.toLowerCase()));
+  }
+  if (filters?.level && filters.level !== 'all') {
+    list = list.filter(r => r.level === filters.level);
   }
   if (filters?.verification && filters.verification !== 'all') {
     list = list.filter(r => r.verification_status === filters.verification);
@@ -49,6 +85,7 @@ function filterReps(reps: Representative[], filters?: { district?: string; verif
       r.name.toLowerCase().includes(q) ||
       r.organization.toLowerCase().includes(q) ||
       r.role.toLowerCase().includes(q) ||
+      (r.ministry || '').toLowerCase().includes(q) ||
       r.district.toLowerCase().includes(q)
     );
   }
@@ -85,25 +122,31 @@ export async function createRepresentative(rep: Representative): Promise<Represe
   }
 }
 
-export async function getComplaints(filters?: { district?: string; category?: string; status?: string; search?: string }): Promise<Complaint[]> {
+export async function getComplaints(filters?: ComplaintFilters): Promise<Complaint[]> {
   const client = getDb();
   if (!isSupabaseConfigured || !client) {
     return filterComplaints(mockStore.getComplaints(), filters);
   }
   try {
     let query = client.from('complaints').select('*');
+    if (filters?.state && filters.state !== 'all') {
+      query = query.ilike('state', `%${filters.state}%`);
+    }
     if (filters?.district && filters.district !== 'all') {
       query = query.ilike('district', filters.district);
     }
     if (filters?.category && filters.category !== 'all') {
       query = query.ilike('category', filters.category);
     }
+    if (filters?.ministry && filters.ministry !== 'all') {
+      query = query.ilike('ministry', `%${filters.ministry}%`);
+    }
     if (filters?.status && filters.status !== 'all') {
       query = query.eq('status', filters.status);
     }
     if (filters?.search) {
       const q = `%${filters.search}%`;
-      query = query.or(`reference_number.ilike.${q},title.ilike.${q},locality.ilike.${q},district.ilike.${q}`);
+      query = query.or(`reference_number.ilike.${q},title.ilike.${q},locality.ilike.${q},district.ilike.${q},state.ilike.${q}`);
     }
     const { data, error } = await query.order('created_at', { ascending: false });
     if (error || !data || data.length === 0) {
@@ -115,13 +158,19 @@ export async function getComplaints(filters?: { district?: string; category?: st
   }
 }
 
-function filterComplaints(complaints: Complaint[], filters?: { district?: string; category?: string; status?: string; search?: string }): Complaint[] {
+function filterComplaints(complaints: Complaint[], filters?: ComplaintFilters): Complaint[] {
   let list = [...complaints];
+  if (filters?.state && filters.state !== 'all') {
+    list = list.filter(c => c.state.toLowerCase().includes(filters.state!.toLowerCase()));
+  }
   if (filters?.district && filters.district !== 'all') {
     list = list.filter(c => c.district.toLowerCase() === filters.district!.toLowerCase());
   }
   if (filters?.category && filters.category !== 'all') {
     list = list.filter(c => c.category.toLowerCase() === filters.category!.toLowerCase());
+  }
+  if (filters?.ministry && filters.ministry !== 'all') {
+    list = list.filter(c => (c.ministry || '').toLowerCase().includes(filters.ministry!.toLowerCase()));
   }
   if (filters?.status && filters.status !== 'all') {
     list = list.filter(c => c.status === filters.status);
@@ -132,7 +181,8 @@ function filterComplaints(complaints: Complaint[], filters?: { district?: string
       c.reference_number.toLowerCase().includes(q) ||
       c.title.toLowerCase().includes(q) ||
       c.locality.toLowerCase().includes(q) ||
-      c.district.toLowerCase().includes(q)
+      c.district.toLowerCase().includes(q) ||
+      c.state.toLowerCase().includes(q)
     );
   }
   return list;

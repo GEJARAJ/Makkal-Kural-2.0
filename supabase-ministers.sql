@@ -1,149 +1,440 @@
--- Tamil Nadu Cabinet Ministers & Chief Minister
--- Generated from mock-store.ts
+-- ==============================================================================
+-- Makkal Kural 2.0 — Central Government Ministries & Representatives Seed Data
+-- Union Cabinet Ministers, Central Portfolios, Lok Sabha MPs & CPGRAMS Nodal Authorities
+-- ==============================================================================
 
--- Ensure columns can hold long values
-ALTER TABLE representatives ALTER COLUMN category_specialty TYPE TEXT;
-ALTER TABLE representatives ALTER COLUMN name TYPE TEXT;
-ALTER TABLE representatives ALTER COLUMN organization TYPE TEXT;
+-- Clean up existing seed data if re-running
+DELETE FROM representatives;
 
-TRUNCATE TABLE representatives CASCADE;
+INSERT INTO representatives (
+  id, name, role, organization, ministry, level, category_specialty, 
+  state, district, constituency, parliamentary_constituency, email, x_handle, 
+  official_website, source_url, verification_status, last_verified_at, active
+) VALUES
+-- 1. Prime Minister & Public Grievances
+(
+  'a0000001-0000-0000-0000-000000000001',
+  'Shri Narendra Modi',
+  'Prime Minister of India / Minister of Personnel & Public Grievances',
+  'Prime Minister''s Office (PMO) & DARPG',
+  'Ministry of Personnel, Public Grievances and Pensions',
+  'CABINET_MINISTER',
+  'all, general administration, central policy, public grievances, national development',
+  'Uttar Pradesh',
+  'Varanasi',
+  'Varanasi',
+  'Varanasi',
+  'pmo.grievance@gov.in',
+  '@PMOIndia',
+  'https://www.pmindia.gov.in',
+  'https://www.india.gov.in/my-government/prime-ministers-office',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '69e8ac91-a5ab-48ae-ab7f-ec677ce3bb82', 'Hon''ble Chief Minister C. Joseph Vijay', 'Chief Minister', 'Government of Tamil Nadu', 'Public, Home, General Administration, Municipal Administration, Urban and Water Supply, Police, IAS, IPS, IFS, Special Programme Implementation, Poverty Alleviation, Youth Welfare, Welfare of Children, Aged, Differently Abled Persons', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'cmo@tn.gov.in', 'CMOTamilNadu', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 2. Road Transport and Highways
+(
+  'a0000001-0000-0000-0000-000000000002',
+  'Shri Nitin Gadkari',
+  'Union Minister of Road Transport and Highways',
+  'Ministry of Road Transport and Highways (MoRTH / NHAI)',
+  'Ministry of Road Transport and Highways',
+  'CABINET_MINISTER',
+  'highways-roads, national highways, expressways, flyovers, toll plaza, nhai, bridges, road safety',
+  'Maharashtra',
+  'Nagpur',
+  'Nagpur',
+  'Nagpur',
+  'nitin.gadkari@nic.in',
+  '@nitin_gadkari',
+  'https://morth.nic.in',
+  'https://morth.nic.in/who-is-who',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '29154109-2819-48f2-9715-529bd5a6d94b', 'Hon''ble Minister N. Anand', 'Cabinet Minister', 'Government of Tamil Nadu', 'Rural Development, Panchayats, Rural Indebtedness, Irrigation, Water Resources, Small Irrigation', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_wrd@tn.gov.in', 'TNRuralDevMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 3. Railways, Information & Broadcasting, Electronics & IT
+(
+  'a0000001-0000-0000-0000-000000000003',
+  'Shri Ashwini Vaishnaw',
+  'Union Minister of Railways, Information & Broadcasting, Electronics & IT',
+  'Ministry of Railways / MeitY',
+  'Ministry of Railways',
+  'CABINET_MINISTER',
+  'railways, trains, railway stations, pantry food, train delays, electronics, telecom, meity, digital india',
+  'All India',
+  'National',
+  'Rajya Sabha (Odisha)',
+  'All India',
+  'railgrievance@rb.railnet.gov.in',
+  '@AshwiniVaishnaw',
+  'https://indianrailways.gov.in',
+  'https://indianrailways.gov.in/railwayboard',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '42d46043-82b9-43c4-afa6-70d65a46c37b', 'Hon''ble Minister Aadhav Arjuna', 'Cabinet Minister', 'Government of Tamil Nadu', 'Public Works, Buildings, Highways, Minor Ports, Sports Development', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_pwd@tn.gov.in', 'TNPWDMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 4. Jal Shakti (Drinking Water & Sanitation / River Development)
+(
+  'a0000001-0000-0000-0000-000000000004',
+  'Shri C. R. Patil',
+  'Union Minister of Jal Shakti',
+  'Ministry of Jal Shakti',
+  'Ministry of Jal Shakti',
+  'CABINET_MINISTER',
+  'water-jal-shakti, jal jeevan mission, drinking water, river cleaning, namami gange, groundwater, canal irrigation',
+  'Gujarat',
+  'Surat',
+  'Navsari',
+  'Navsari',
+  'minister-jalshakti@gov.in',
+  '@CRPaatil',
+  'https://jalshakti.gov.in',
+  'https://jalshakti.gov.in/en/who-is-who',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'f72eeaca-58e2-4025-b38d-32ddc6d1d739', 'Hon''ble Minister Dr. K.G. Arunraj', 'Cabinet Minister', 'Government of Tamil Nadu', 'Health, Medical Education, Family Welfare, Hospitals, Public Health', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_health@tn.gov.in', 'TNHealthMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 5. Power & Housing and Urban Affairs
+(
+  'a0000001-0000-0000-0000-000000000005',
+  'Shri Manohar Lal Khattar',
+  'Union Minister of Housing and Urban Affairs & Minister of Power',
+  'Ministry of Housing and Urban Affairs (MoHUA) & Ministry of Power',
+  'Ministry of Housing and Urban Affairs',
+  'CABINET_MINISTER',
+  'urban-housing, power-energy, pmay, smart cities, metro rail, swachh bharat, powergrid, national grid, solar rooftop',
+  'Haryana',
+  'Karnal',
+  'Karnal',
+  'Karnal',
+  'minister-mohua@gov.in',
+  '@mlkhattar',
+  'https://mohua.gov.in',
+  'https://mohua.gov.in/cms/who-is-who.php',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '63998466-4e30-4a31-af06-7008dbc569a7', 'Hon''ble Minister K.A. Sengottaiyan', 'Cabinet Minister', 'Government of Tamil Nadu', 'Revenue, Disaster Management, Relief, Land Records, Registration', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_revenue@tn.gov.in', 'TNRevenueMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 6. Communications & Telecom (DoT / India Post)
+(
+  'a0000001-0000-0000-0000-000000000006',
+  'Shri Jyotiraditya Scindia',
+  'Union Minister of Communications and Minister of Development of North Eastern Region',
+  'Ministry of Communications (DoT / India Post / BSNL)',
+  'Ministry of Communications',
+  'CABINET_MINISTER',
+  'telecom-postal, speed post, india post, bsnl, rural broadband, bharatnet, postal parcel, telecom network',
+  'Madhya Pradesh',
+  'Guna',
+  'Guna',
+  'Guna',
+  'minister-comm@gov.in',
+  '@JM_Scindia',
+  'https://dot.gov.in',
+  'https://dot.gov.in/whos-who',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '57696daa-514b-4686-8687-4c29ecd0e2cf', 'Hon''ble Minister P. Venkataramanan', 'Cabinet Minister', 'Government of Tamil Nadu', 'Food and Civil Supplies, Consumer Protection, Price Control, Ration Shops', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_food@tn.gov.in', 'TNFoodMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 7. Environment, Forest and Climate Change (CPCB)
+(
+  'a0000001-0000-0000-0000-000000000007',
+  'Shri Bhupender Yadav',
+  'Union Minister of Environment, Forest and Climate Change',
+  'Ministry of Environment, Forest and Climate Change (MoEFCC / CPCB)',
+  'Ministry of Environment, Forest and Climate Change',
+  'CABINET_MINISTER',
+  'environment-pollution, cpcb, industrial emissions, river effluent, deforestation, illegal mining, e-waste, wildlife',
+  'Rajasthan',
+  'Alwar',
+  'Alwar',
+  'Alwar',
+  'mefcc@gov.in',
+  '@byadavbjp',
+  'https://moef.gov.in',
+  'https://moef.gov.in/en/about-the-ministry/who-is-who/',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'd973af9e-c727-499b-8dc8-283cfc27138e', 'Hon''ble Minister R. Nirmalkumar', 'Cabinet Minister', 'Government of Tamil Nadu', 'Energy Resources, Electricity, Law, Courts, Prisons, Prevention of Corruption', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_energy@tn.gov.in', 'TNEnergyMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 8. Health and Family Welfare & Chemicals and Fertilizers
+(
+  'a0000001-0000-0000-0000-000000000008',
+  'Shri J. P. Nadda',
+  'Union Minister of Health and Family Welfare & Chemicals and Fertilizers',
+  'Ministry of Health and Family Welfare (MoHFW / AIIMS / NHA)',
+  'Ministry of Health and Family Welfare',
+  'CABINET_MINISTER',
+  'health-welfare, ayushman bharat, pm-jay, aiims hospitals, cghs dispensaries, generic medicines, fssai food adulteration',
+  'All India',
+  'National',
+  'Rajya Sabha (Gujarat)',
+  'All India',
+  'hfwminister@gov.in',
+  '@JPNadda',
+  'https://mohfw.gov.in',
+  'https://mohfw.gov.in/about-us/who-is-who',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'ee2b9331-785b-4387-b9d6-87e15c6afad0', 'Hon''ble Minister Rajmohan', 'Cabinet Minister', 'Government of Tamil Nadu', 'School Education, Tamil Development, Information and Publicity, Film Technology, Newsprint Control', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_schedu@tn.gov.in', 'TNSchoolEduMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 9. Finance & Corporate Affairs
+(
+  'a0000001-0000-0000-0000-000000000009',
+  'Smt. Nirmala Sitharaman',
+  'Union Minister of Finance and Corporate Affairs',
+  'Ministry of Finance (CBDT / CBIC / Banking Ombudsman)',
+  'Ministry of Finance',
+  'CABINET_MINISTER',
+  'finance-pension, banking ombudsman, upi fraud, income tax refund, gst portal, epfo, national pension system, central taxes',
+  'All India',
+  'National',
+  'Rajya Sabha (Karnataka)',
+  'All India',
+  'appointment.fm@gov.in',
+  '@nsitharaman',
+  'https://finmin.nic.in',
+  'https://finmin.nic.in/whos-who',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'db10f799-b75c-4ce6-8ae1-424b5fb702ba', 'Hon''ble Minister T.K. Prabhu', 'Cabinet Minister', 'Government of Tamil Nadu', 'Natural Resources, Minerals, Mines, Geology', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_natural@tn.gov.in', 'TNNaturalResMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 10. Consumer Affairs, Food and Public Distribution
+(
+  'a0000001-0000-0000-0000-000000000010',
+  'Shri Pralhad Joshi',
+  'Union Minister of Consumer Affairs, Food and Public Distribution & New and Renewable Energy',
+  'Ministry of Consumer Affairs, Food and Public Distribution / MNRE',
+  'Ministry of Consumer Affairs, Food and Public Distribution',
+  'CABINET_MINISTER',
+  'consumer-civil-supplies, national consumer helpline, nfsa food grains, e-commerce fraud, misleading ads, solar subsidy',
+  'Karnataka',
+  'Dharwad',
+  'Dharwad',
+  'Dharwad',
+  'minister.ca@nic.in',
+  '@JoshiPralhad',
+  'https://consumeraffairs.nic.in',
+  'https://consumeraffairs.nic.in/whos-who',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'b43ee7e0-2e7c-48a6-a549-a124d3e83d48', 'Hon''ble Minister Dr. T.R.B. Rajaa', 'Cabinet Minister', 'Government of Tamil Nadu', 'Industries, Investment Promotion, Manufacturing, Industrial Estates', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_industry@tn.gov.in', 'TNIndustryMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 11. Civil Aviation
+(
+  'a0000001-0000-0000-0000-000000000011',
+  'Shri Kinjarapu Rammohan Naidu',
+  'Union Minister of Civil Aviation',
+  'Ministry of Civil Aviation (DGCA / AAI / AirSewa)',
+  'Ministry of Civil Aviation',
+  'CABINET_MINISTER',
+  'civil-aviation, airsewa, airline refund, airport infrastructure, luggage delay, flight cancellation, udan',
+  'Andhra Pradesh',
+  'Srikakulam',
+  'Srikakulam',
+  'Srikakulam',
+  'minister.moca@nic.in',
+  '@RamMNK',
+  'https://www.civilaviation.gov.in',
+  'https://www.civilaviation.gov.in/whos-who',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '9d8e5ae3-3c8e-43c8-8fc8-6dd2feacf110', 'Hon''ble Minister P. Viswanathan', 'Cabinet Minister', 'Government of Tamil Nadu', 'Higher Education, Technical Education, Electronics, Science and Technology, Research', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_hredu@tn.gov.in', 'TNHigherEduMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 12. Agriculture and Farmers Welfare & Rural Development
+(
+  'a0000001-0000-0000-0000-000000000012',
+  'Shri Shivraj Singh Chouhan',
+  'Union Minister of Agriculture and Farmers Welfare & Minister of Rural Development',
+  'Ministry of Agriculture & Ministry of Rural Development',
+  'Ministry of Agriculture and Farmers Welfare',
+  'CABINET_MINISTER',
+  'agriculture-rural, pm-kisan, pmgsy rural roads, crop insurance pmfby, fertilizer supply, mgnrega rural wages',
+  'Madhya Pradesh',
+  'Vidisha',
+  'Vidisha',
+  'Vidisha',
+  'agri.minister@gov.in',
+  '@ChouhanShivraj',
+  'https://agricoop.gov.in',
+  'https://agricoop.gov.in/en/who-is-who',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'e1afdb53-a71d-48f1-b8f5-bf064a95a692', 'Hon''ble Minister S. Rajesh Kumar', 'Cabinet Minister', 'Government of Tamil Nadu', 'Tourism, Tourism Development Corporation, Heritage, Pilgrimage', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_tourism@tn.gov.in', 'TNTourismMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
+-- 13. Central Public Grievance Portal Officer (CPGRAMS / DARPG)
+(
+  'a0000001-0000-0000-0000-000000000013',
+  'Secretary, DARPG / CPGRAMS Nodal Cell',
+  'Director General / Central Public Grievances Officer',
+  'Department of Administrative Reforms and Public Grievances (DARPG)',
+  'Ministry of Personnel, Public Grievances and Pensions',
+  'CENTRAL_AGENCY',
+  'all, cpgrams, general civic grievances, central escalation, administrative reform',
+  'Delhi',
+  'New Delhi',
+  'New Delhi',
+  'New Delhi',
+  'cpgrams-grievance@nic.in',
+  '@DARPG_GoI',
+  'https://pgportal.gov.in',
+  'https://darpg.gov.in/whos-who',
+  'VERIFIED',
+  NOW(),
+  true
+),
 
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '80a19d9a-dadf-46b5-b57d-1695b10255f7', 'Hon''ble Minister A.M. Shahjahan', 'Cabinet Minister', 'Government of Tamil Nadu', 'Minorities Welfare, Wakf Board, Minority Education, Urdu', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_mw@tn.gov.in', 'TNMinorityMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'a4a0149b-ec97-438b-bb0a-afaa96f3903d', 'Hon''ble Minister Vanni Arasu', 'Cabinet Minister', 'Government of Tamil Nadu', 'Social Justice, Adi Dravidar Welfare, Hill Tribes, SC/ST Welfare', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_sj@tn.gov.in', 'TNSocialJusticeMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '530f81fb-842b-472a-928a-47b72b70e3ae', 'Hon''ble Minister A. Vijay Tamilan Parthiban', 'Cabinet Minister', 'Government of Tamil Nadu', 'Transport, Motor Vehicles, National Highways, Road Transport, Public Transport', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_transport@tn.gov.in', 'TNTransportMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'd2ba57fb-f051-4657-9a2a-231226abfb1b', 'Hon''ble Minister B. Rajkumar', 'Cabinet Minister', 'Government of Tamil Nadu', 'Housing, Urban Development, Town Planning, Slum Clearance', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_housing@tn.gov.in', 'TNHousingMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '196069b4-f6f8-4f6e-a6d5-074159f1445f', 'Hon''ble Minister V. Sampath Kumar', 'Cabinet Minister', 'Government of Tamil Nadu', 'Backward Classes Welfare, Most Backward Classes, De-notified Communities, Reservation', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_bcmw@tn.gov.in', 'TNBCMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '0ebd3087-ad0a-4d76-bc8c-2cbb0fd401e9', 'Hon''ble Minister M. Vijay Balaji', 'Cabinet Minister', 'Government of Tamil Nadu', 'Handlooms, Textiles, Khadi, Handicrafts, Silk', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_textiles@tn.gov.in', 'TNTextilesMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'd70d963e-e57a-40e4-8f55-917e0c6b8326', 'Hon''ble Minister K. Vignesh', 'Cabinet Minister', 'Government of Tamil Nadu', 'Prohibition, Excise, Liquor Control, Narcotics', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_excise@tn.gov.in', 'TNProhibitionMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '16c9193b-f478-4933-99c3-5bd931819d08', 'Hon''ble Minister K. Thennarasu', 'Cabinet Minister', 'Government of Tamil Nadu', 'Non-Resident Tamils Welfare, Overseas Indians, Emigration', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_nrt@tn.gov.in', 'TN_NRTMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '7bfb04bc-6b82-4755-95b7-71e9eeb2b396', 'Hon''ble Minister J. Mohamed Farvas', 'Cabinet Minister', 'Government of Tamil Nadu', 'Labour Welfare, Skill Development, Employment, Industrial Training, Workers Rights', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_labour@tn.gov.in', 'TNLabourMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '0cde03c1-f5aa-4e2b-821b-e8e11c870424', 'Hon''ble Minister V. Gandhiraj', 'Cabinet Minister', 'Government of Tamil Nadu', 'Co-operation, Cooperative Societies, Cooperative Banks', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_coop@tn.gov.in', 'TNCoopMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '6d9b2d80-9f5c-4418-88a9-68fc183267f1', 'Hon''ble Minister Jagadeshwari K.', 'Cabinet Minister', 'Government of Tamil Nadu', 'Social Welfare, Women Empowerment, Child Welfare, Orphanages, Destitutes', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_sw@tn.gov.in', 'TNSocialWelfareMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '5db643bc-72bc-4843-977a-580b458f37c4', 'Hon''ble Minister R. Vinoth', 'Cabinet Minister', 'Government of Tamil Nadu', 'Agriculture, Farmers Welfare, Crop Insurance, Agricultural Marketing', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_agri@tn.gov.in', 'TNAgriMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '54f3ac61-e829-4de0-9451-88f05b7b7e86', 'Hon''ble Minister C. Vijayalakshmi', 'Cabinet Minister', 'Government of Tamil Nadu', 'Milk and Dairy Development, Dairy Cooperatives, Animal Products', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_mdd@tn.gov.in', 'TNDairyMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'a7fbeec8-a206-498c-9f5f-67f0990d015f', 'Hon''ble Minister D. Sarathkumar', 'Cabinet Minister', 'Government of Tamil Nadu', 'Human Resources Management, Ex-Servicemen Welfare, Pension', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_hr@tn.gov.in', 'TNHRMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '61c833f2-cbc0-4a90-8973-989e9dd492ca', 'Hon''ble Minister Ramesh', 'Cabinet Minister', 'Government of Tamil Nadu', 'Hindu Religious and Charitable Endowments, Temples, Religious Institutions', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_hrce@tn.gov.in', 'TNHRCEMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'e91ace03-fbde-456d-9e49-9e101e7092cf', 'Hon''ble Minister P. Mathan Raja', 'Cabinet Minister', 'Government of Tamil Nadu', 'Micro, Small and Medium Enterprises, MSME, Entrepreneurship, Startups', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_msme@tn.gov.in', 'TNMSMEMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  '68aa13bf-79b5-4500-9dfd-aac08429fde7', 'Hon''ble Minister N. Marie Wilson', 'Cabinet Minister', 'Government of Tamil Nadu', 'Finance, Planning and Development, Budget, Treasury, Economics', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_finance@tn.gov.in', 'TNFinanceMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'a626e3a1-f26c-4a3e-87a6-d2b6d11d33eb', 'Hon''ble Minister A. Srinath', 'Cabinet Minister', 'Government of Tamil Nadu', 'Fisheries, Fishermen Welfare, Aquaculture, Fishing Harbours', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_fisheries@tn.gov.in', 'TNFisheriesMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'd69cb7d5-35fe-491b-9937-792a06c75579', 'Hon''ble Minister S. Kamali', 'Cabinet Minister', 'Government of Tamil Nadu', 'Animal Husbandry, Veterinary Services, Livestock, Poultry', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_ah@tn.gov.in', 'TNAHMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'e7ab641b-adc5-4202-97fe-e93128bc7286', 'Hon''ble Minister R. Kumar', 'Cabinet Minister', 'Government of Tamil Nadu', 'Artificial Intelligence, IT and Digital Services, Electronics, E-Governance, Technology', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_it@tn.gov.in', 'TNITMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'f8f13ba3-e98d-4d57-8937-cbb6d0839bcf', 'Hon''ble Minister R.V. Ranjithkumar', 'Cabinet Minister', 'Government of Tamil Nadu', 'Forests, Wildlife, Environment, Afforestation, Forest Conservation', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_forests@tn.gov.in', 'TNForestMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'd6b67552-f8b4-46f6-bbd7-fb7c6a40a84a', 'Hon''ble Minister D. Logesh Tamilselvan', 'Cabinet Minister', 'Government of Tamil Nadu', 'Commercial Taxes and Registration, GST, Stamp Duty, Registration', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_ctax@tn.gov.in', 'TNCTaxMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
-);
-
-INSERT INTO representatives (id, name, role, organization, category_specialty, state, district, constituency, email, x_handle, official_website, source_url, verification_status, last_verified_at, active, created_at, updated_at) VALUES (
-  'cac3e4cb-2638-41e3-93d2-058f0f32ad96', 'Hon''ble Minister V.K. Rajeev', 'Cabinet Minister', 'Government of Tamil Nadu', 'Environment and Climate Change, Pollution Control, Climate Action', 'Tamil Nadu', 'Chennai', 'All Constituencies', 'minister_env@tn.gov.in', 'TNEnvMin', 'https://www.tn.gov.in', 'https://www.tn.gov.in/minister_list.php', 'VERIFIED', '2026-08-23T06:00:00Z', true, '2026-01-01T00:00:00Z', '2026-08-23T06:00:00Z'
+-- 14. Key Lok Sabha MPs (Delhi, Tamil Nadu, Maharashtra, Karnataka, Uttar Pradesh, Telangana, West Bengal)
+(
+  'a0000001-0000-0000-0000-000000000014',
+  'Smt. Bansuri Swaraj',
+  'Member of Parliament (Lok Sabha)',
+  'Parliament of India (Lok Sabha)',
+  'Lok Sabha Secretariat',
+  'LOK_SABHA_MP',
+  'all, new delhi local grievance, municipal, mp lad fund, public amenities',
+  'Delhi',
+  'New Delhi',
+  'New Delhi',
+  'New Delhi',
+  'bansuri.swaraj.mp@sansad.nic.in',
+  '@BansuriSwaraj',
+  'https://sansad.in/ls',
+  'https://sansad.in/ls/members',
+  'VERIFIED',
+  NOW(),
+  true
+),
+(
+  'a0000001-0000-0000-0000-000000000015',
+  'Dr. Kalanidhi Veeraswamy',
+  'Member of Parliament (Lok Sabha)',
+  'Parliament of India (Lok Sabha)',
+  'Lok Sabha Secretariat',
+  'LOK_SABHA_MP',
+  'all, chennai north local grievance, coastal roads, ports, municipal water, drainage',
+  'Tamil Nadu',
+  'Chennai',
+  'Chennai North',
+  'Chennai North',
+  'kalanidhi.v.mp@sansad.nic.in',
+  '@KalanidhiV',
+  'https://sansad.in/ls',
+  'https://sansad.in/ls/members',
+  'VERIFIED',
+  NOW(),
+  true
+),
+(
+  'a0000001-0000-0000-0000-000000000016',
+  'Smt. Thamizhachi Thangapandian',
+  'Member of Parliament (Lok Sabha)',
+  'Parliament of India (Lok Sabha)',
+  'Lok Sabha Secretariat',
+  'LOK_SABHA_MP',
+  'all, chennai south local grievance, it corridor, omr highway, velachery metro, urban amenities',
+  'Tamil Nadu',
+  'Chennai',
+  'Chennai South',
+  'Chennai South',
+  'thamizhachi.mp@sansad.nic.in',
+  '@ThamizhachiTh',
+  'https://sansad.in/ls',
+  'https://sansad.in/ls/members',
+  'VERIFIED',
+  NOW(),
+  true
+),
+(
+  'a0000001-0000-0000-0000-000000000017',
+  'Shri Tejasvi Surya',
+  'Member of Parliament (Lok Sabha)',
+  'Parliament of India (Lok Sabha)',
+  'Lok Sabha Secretariat',
+  'LOK_SABHA_MP',
+  'all, bangalore south local grievance, bengaluru metro, suburban rail, urban traffic, digital tech',
+  'Karnataka',
+  'Bengaluru Urban',
+  'Bangalore South',
+  'Bangalore South',
+  'tejasvi.surya.mp@sansad.nic.in',
+  '@Tejasvi_Surya',
+  'https://sansad.in/ls',
+  'https://sansad.in/ls/members',
+  'VERIFIED',
+  NOW(),
+  true
+),
+(
+  'a0000001-0000-0000-0000-000000000018',
+  'Shri Arvind Sawant',
+  'Member of Parliament (Lok Sabha)',
+  'Parliament of India (Lok Sabha)',
+  'Lok Sabha Secretariat',
+  'LOK_SABHA_MP',
+  'all, mumbai south local grievance, port trust, coastal road, railway terminus, municipal amenities',
+  'Maharashtra',
+  'Mumbai City',
+  'Mumbai South',
+  'Mumbai South',
+  'arvind.sawant.mp@sansad.nic.in',
+  '@AGSawant',
+  'https://sansad.in/ls',
+  'https://sansad.in/ls/members',
+  'VERIFIED',
+  NOW(),
+  true
+),
+(
+  'a0000001-0000-0000-0000-000000000019',
+  'Shri Asaduddin Owaisi',
+  'Member of Parliament (Lok Sabha)',
+  'Parliament of India (Lok Sabha)',
+  'Lok Sabha Secretariat',
+  'LOK_SABHA_MP',
+  'all, hyderabad local grievance, old city drainage, heritage preservation, municipal power, water',
+  'Telangana',
+  'Hyderabad',
+  'Hyderabad',
+  'Hyderabad',
+  'asad.owaisi.mp@sansad.nic.in',
+  '@asadowaisi',
+  'https://sansad.in/ls',
+  'https://sansad.in/ls/members',
+  'VERIFIED',
+  NOW(),
+  true
+),
+(
+  'a0000001-0000-0000-0000-000000000020',
+  'Shri Rajnath Singh',
+  'Union Minister of Defence & MP (Lok Sabha)',
+  'Ministry of Defence & Lok Sabha',
+  'Ministry of Defence',
+  'CABINET_MINISTER',
+  'all, lucknow local grievance, defence estates, cantt roads, national infrastructure',
+  'Uttar Pradesh',
+  'Lucknow',
+  'Lucknow',
+  'Lucknow',
+  'rajnath.singh@sansad.nic.in',
+  '@rajnathsingh',
+  'https://www.mod.gov.in',
+  'https://sansad.in/ls/members',
+  'VERIFIED',
+  NOW(),
+  true
 );

@@ -86,8 +86,9 @@ export async function POST(req: NextRequest) {
 
     const routing = await routeComplaintToRepresentative(
       data.category,
+      data.state,
       data.district,
-      data.constituency
+      data.constituency || data.parliamentaryConstituency
     );
 
     const assignedRep = routing.representative;
@@ -98,7 +99,7 @@ export async function POST(req: NextRequest) {
         id: crypto.randomUUID(),
         complaint_id: complaintId,
         status: 'SUBMITTED',
-        message: 'Complaint submitted by citizen and registered with reference ' + refNumber,
+        message: 'Grievance submitted by citizen and registered with reference ' + refNumber,
         is_public: true,
         created_at: now,
       },
@@ -112,6 +113,7 @@ export async function POST(req: NextRequest) {
       reference_number: refNumber,
       category: data.category,
       subcategory: data.subcategory,
+      ministry: routing.matchedMinistry || data.ministry,
       title: data.title,
       description: data.description,
       original_language: data.originalLanguage,
@@ -122,6 +124,7 @@ export async function POST(req: NextRequest) {
       district: data.district,
       city: data.city,
       constituency: data.constituency,
+      parliamentary_constituency: data.parliamentaryConstituency || data.constituency,
       locality: data.locality,
       latitude: data.latitude,
       longitude: data.longitude,

@@ -1,5 +1,5 @@
 export type UserRole = 'USER' | 'ADMIN';
-export type PreferredLanguage = 'en' | 'ta';
+export type PreferredLanguage = 'en' | 'ta' | 'hi';
 
 export type SeverityLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 
@@ -16,8 +16,10 @@ export type ComplaintStatus =
 
 export type VerificationStatus = 'VERIFIED' | 'NEEDS_REVIEW' | 'DISABLED';
 
-export type DeliveryChannel = 'EMAIL' | 'X_API' | 'X_SHARE' | 'WHATSAPP' | 'SMS' | 'PORTAL';
+export type DeliveryChannel = 'EMAIL' | 'X_API' | 'X_SHARE' | 'WHATSAPP' | 'SMS' | 'PORTAL' | 'CPGRAMS';
 export type DeliveryStatus = 'SUCCESS' | 'FAILED' | 'PENDING' | 'QUEUED';
+
+export type RepresentativeLevel = 'CENTRAL_MINISTRY' | 'CABINET_MINISTER' | 'LOK_SABHA_MP' | 'RAJYA_SABHA_MP' | 'CENTRAL_AGENCY' | 'STATE_NODAL';
 
 export interface Profile {
   id: string;
@@ -35,10 +37,13 @@ export interface Representative {
   name: string;
   role: string;
   organization: string;
+  ministry?: string;
+  level?: RepresentativeLevel;
   category_specialty?: string;
   state: string;
   district: string;
   constituency?: string;
+  parliamentary_constituency?: string;
   email: string;
   x_handle?: string;
   official_website?: string;
@@ -100,6 +105,7 @@ export interface Complaint {
   user_id?: string;
   category: string;
   subcategory: string;
+  ministry?: string;
   title: string;
   description: string;
   original_language: PreferredLanguage;
@@ -110,6 +116,7 @@ export interface Complaint {
   district: string;
   city: string;
   constituency?: string;
+  parliamentary_constituency?: string;
   locality: string;
   latitude?: number;
   longitude?: number;

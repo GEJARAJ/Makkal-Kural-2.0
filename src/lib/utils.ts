@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { PreferredLanguage } from '@/types/database';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -8,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 export function generateReferenceNumber(): string {
   const year = new Date().getFullYear();
   const randomNum = Math.floor(100000 + Math.random() * 900000);
-  return `MK-${year}-${randomNum}`;
+  return `MK2-${year}-${randomNum}`;
 }
 
 export function maskEmail(email?: string): string {
@@ -26,12 +27,13 @@ export function maskPhone(phone?: string): string {
   return '******' + clean.slice(-4);
 }
 
-export function formatDate(dateString?: string, locale: 'en' | 'ta' = 'en'): string {
+export function formatDate(dateString?: string, locale: PreferredLanguage | 'en' | 'ta' | 'hi' = 'en'): string {
   if (!dateString) return '-';
   try {
     const d = new Date(dateString);
     if (isNaN(d.getTime())) return dateString;
-    return d.toLocaleDateString(locale === 'ta' ? 'ta-IN' : 'en-IN', {
+    const loc = locale === 'ta' ? 'ta-IN' : (locale === 'hi' ? 'hi-IN' : 'en-IN');
+    return d.toLocaleDateString(loc, {
       day: 'numeric',
       month: 'short',
       year: 'numeric',

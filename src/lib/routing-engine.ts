@@ -6,168 +6,185 @@ export interface RoutingResult {
   isVerified: boolean;
   matchScore: number;
   routingReason: string;
+  matchedMinistry?: string;
+  matchedLevel?: string;
 }
 
-const PORTFOLIO_KEYWORDS: Record<string, string[]> = {
-  'roads': ['public works', 'highways', 'roads', 'infrastructure', 'buildings', 'minor ports'],
-  'water': ['water resources', 'irrigation', 'water supply', 'rural development', 'municipal administration'],
-  'electricity': ['energy', 'electricity', 'power', 'tangedco'],
-  'health': ['health', 'medical', 'hospital', 'family welfare', 'public health'],
-  'education': ['school education', 'higher education', 'technical education', 'education'],
-  'agriculture': ['agriculture', 'farmers', 'crop', 'irrigation', 'farm'],
-  'finance': ['finance', 'revenue', 'budget', 'tax', 'treasury', 'planning'],
-  'food': ['food', 'civil supplies', 'ration', 'consumer', 'price control'],
-  'law': ['law', 'courts', 'prisons', 'justice', 'legal'],
-  'transport': ['transport', 'motor vehicles', 'buses', 'traffic', 'highways'],
-  'housing': ['housing', 'urban development', 'town planning', 'slum'],
-  'social': ['social welfare', 'women', 'child', 'orphan', 'destitutes'],
-  'labour': ['labour', 'employment', 'skill development', 'workers', 'industrial training'],
-  'industries': ['industries', 'investment', 'manufacturing', 'industrial estates', 'msme'],
-  'environment': ['environment', 'climate', 'pollution', 'forests', 'wildlife'],
-  'tourism': ['tourism', 'heritage', 'pilgrimage'],
-  'minorities': ['minorities', 'wakf', 'minority education'],
-  'women': ['women', 'gender', 'self-help groups', 'shg'],
-  'children': ['children', 'child welfare', 'school education'],
-  'dairy': ['dairy', 'milk', 'animal husbandry', 'livestock', 'poultry', 'fisheries'],
-  'cooperation': ['co-operation', 'cooperative', 'cooperative societies'],
-  'handlooms': ['handlooms', 'textiles', 'khadi', 'handicrafts', 'silk'],
-  'backward': ['backward classes', 'most backward', 'denotified', 'reservation'],
-  'adi-dravidar': ['adi dravidar', 'scheduled caste', 'scheduled tribe', 'hill tribes', 'social justice'],
-  'hr': ['human resources', 'pension', 'ex-servicemen'],
-  'hrce': ['hindu religious', 'charitable endowments', 'temples', 'religious'],
-  'nrt': ['non-resident', 'overseas', 'emigration', 'nris'],
-  'excise': ['prohibition', 'excise', 'liquor', 'narcotics'],
-  'it': ['information technology', 'digital services', 'electronics', 'e-governance', 'technology'],
-  'natural-resources': ['minerals', 'mines', 'geology', 'natural resources'],
-  'municipal': ['municipal', 'urban', 'water supply', 'sewerage', 'garbage', 'drainage'],
-  'revenue': ['revenue', 'land records', 'registration', 'disaster management', 'relief'],
+const CENTRAL_PORTFOLIO_KEYWORDS: Record<string, string[]> = {
+  'highways-roads': [
+    'national highway', 'highway', 'nhai', 'expressway', 'flyover', 'toll', 'toll plaza',
+    'fastag', 'road transport', 'morth', 'road safety', 'bypass', 'overbridge', 'pothole on highway'
+  ],
+  'railways': [
+    'railway', 'train', 'irctc', 'rail', 'coach', 'station', 'pantry', 'ticket', 'locomotive',
+    'vande bharat', 'railway track', 'platform', 'berth', 'train delay', 'rail grievance'
+  ],
+  'water-jal-shakti': [
+    'water', 'jal shakti', 'jal jeevan', 'drinking water', 'river', 'namami gange', 'groundwater',
+    'sanitation', 'canal', 'irrigation', 'water resources', 'sewage treatment'
+  ],
+  'power-energy': [
+    'power', 'electricity', 'energy', 'grid', 'powergrid', 'solar', 'pm surya ghar', 'renewable',
+    'transmission', 'substation', 'electrification', 'tariff', 'high tension'
+  ],
+  'urban-housing': [
+    'housing', 'urban', 'pmay', 'pradhan mantri awas', 'smart city', 'metro rail', 'swachh bharat',
+    'urban development', 'slum', 'mohua', 'drainage', 'amrut'
+  ],
+  'telecom-postal': [
+    'telecom', 'postal', 'post', 'speed post', 'india post', 'bsnl', 'mtnl', 'broadband',
+    'bharatnet', 'dot', 'meity', 'aadhaar', 'cyber crime', 'mobile tower', 'digital india'
+  ],
+  'environment-pollution': [
+    'environment', 'pollution', 'cpcb', 'forest', 'emission', 'air quality', 'industrial effluent',
+    'wildlife', 'deforestation', 'toxic waste', 'e-waste', 'national park'
+  ],
+  'health-welfare': [
+    'health', 'hospital', 'aiims', 'ayushman bharat', 'pm-jay', 'cghs', 'medicine', 'fssai',
+    'food safety', 'jan aushadhi', 'medical college', 'family welfare'
+  ],
+  'finance-pension': [
+    'finance', 'banking', 'rbi', 'ombudsman', 'epfo', 'provident fund', 'pf claim', 'pension',
+    'nps', 'sparsh', 'income tax', 'gst', 'insurance', 'upi fraud', 'banking fraud'
+  ],
+  'consumer-civil-supplies': [
+    'consumer', 'consumer affairs', 'misleading ad', 'e-commerce', 'refund fraud', 'nfsa',
+    'ration', 'fci', 'food grain', 'mrp', 'weights and measures'
+  ],
+  'civil-aviation': [
+    'aviation', 'airport', 'airline', 'flight', 'airsewa', 'dgca', 'aai', 'airports authority',
+    'baggage', 'flight cancellation', 'udan'
+  ],
+  'agriculture-rural': [
+    'agriculture', 'pm-kisan', 'kisan', 'farmer', 'rural development', 'pmgsy', 'rural road',
+    'crop insurance', 'pmfby', 'fertilizer', 'urea', 'mgnrega'
+  ],
 };
 
-function getCategoryScore(category: string, rep: Representative): number {
-  const cat = category.toLowerCase();
+function getRepresentativeScore(
+  category: string,
+  rep: Representative,
+  state?: string,
+  district?: string,
+  constituency?: string
+): { score: number; reason: string } {
+  const cat = (category || '').toLowerCase();
   const specialty = (rep.category_specialty || '').toLowerCase();
   const role = (rep.role || '').toLowerCase();
   const org = (rep.organization || '').toLowerCase();
+  const repMinistry = (rep.ministry || '').toLowerCase();
+  const repState = (rep.state || '').toLowerCase();
+  const repDistrict = (rep.district || '').toLowerCase();
+  const repConstituency = (rep.parliamentary_constituency || rep.constituency || '').toLowerCase();
 
   let score = 0;
+  const reasons: string[] = [];
 
+  // Direct category / specialty matching
   if (specialty.includes(cat) || cat.includes(specialty)) {
-    score += 50;
+    score += 45;
+    reasons.push('Direct portfolio specialty match');
   }
 
-  for (const keywords of Object.values(PORTFOLIO_KEYWORDS)) {
-    if (keywords.some(k => cat.includes(k))) {
-      if (keywords.some(k => specialty.includes(k) || role.includes(k) || org.includes(k))) {
-        score += 40;
-        break;
-      }
+  // Check keyword hits for ministry
+  const keywords = CENTRAL_PORTFOLIO_KEYWORDS[cat] || [];
+  let keywordHit = false;
+  for (const kw of keywords) {
+    if (specialty.includes(kw) || role.includes(kw) || org.includes(kw) || repMinistry.includes(kw)) {
+      score += 40;
+      keywordHit = true;
+      reasons.push(`Central ministry portfolio match (${rep.organization})`);
+      break;
     }
   }
 
+  // Location / MP matching
+  if (state && repState.includes(state.toLowerCase())) {
+    score += 10;
+    reasons.push(`State jurisdiction: ${rep.state}`);
+  }
+
+  if (district && repDistrict.includes(district.toLowerCase())) {
+    score += 15;
+    reasons.push(`District: ${rep.district}`);
+  }
+
+  if (constituency && repConstituency.includes(constituency.toLowerCase())) {
+    score += 25;
+    reasons.push(`Constituency Representative: ${rep.name}`);
+  }
+
+  // Verification status boost
   if (rep.verification_status === 'VERIFIED') {
     score += 10;
   }
 
-  return score;
+  // Cabinet Minister bonus for category jurisdiction
+  if (rep.level === 'CABINET_MINISTER' && keywordHit) {
+    score += 20;
+  }
+
+  return {
+    score,
+    reason: reasons.length > 0 ? reasons.join(' • ') : 'Standard Central Grievance routing match',
+  };
 }
 
 export async function routeComplaintToRepresentative(
   category: string,
-  district: string,
+  state: string,
+  district?: string,
   constituency?: string
 ): Promise<RoutingResult> {
   const reps = await getRepresentatives();
-  const districtLower = (district || '').toLowerCase();
-
-  if (!districtLower) {
-    return {
-      isVerified: false,
-      matchScore: 0,
-      routingReason: 'District not specified',
-    };
-  }
-
   const activeReps = reps.filter(r => r.active);
 
-  const districtReps = activeReps.filter(r => {
-    const repDistrict = (r.district || '').toLowerCase();
-    const repConstituency = (r.constituency || '').toLowerCase();
-    const isStateLevel = repConstituency.includes('all constituencies') || repConstituency.includes('all');
-    return repDistrict === districtLower || isStateLevel;
-  });
-
-  if (districtReps.length === 0) {
+  if (activeReps.length === 0) {
     return {
       isVerified: false,
       matchScore: 0,
-      routingReason: `No active contact registered for district: ${district}`,
+      routingReason: 'No active representatives found in system',
     };
   }
 
-  const isMinisterOrMLA = (role: string) => {
-    const r = role.toLowerCase();
-    return r.includes('minister') || r.includes('mla') || r.includes('member of legislative') || r.includes('chief minister');
-  };
+  // Evaluate every representative and find highest score
+  let bestRep: Representative | undefined;
+  let highestScore = -1;
+  let bestReason = '';
 
-  const ministerialReps = districtReps.filter(r => isMinisterOrMLA(r.role));
-  const administrativeReps = districtReps.filter(r => !isMinisterOrMLA(r.role));
-
-  const scoreCandidates = (candidates: Representative[]) => {
-    return candidates
-      .map(c => ({
-        rep: c,
-        score: getCategoryScore(category, c),
-      }))
-      .sort((a, b) => b.score - a.score);
-  };
-
-  const scoredMinisterial = scoreCandidates(ministerialReps);
-  const scoredAdministrative = scoreCandidates(administrativeReps);
-
-  const bestMinisterial = scoredMinisterial[0];
-  const bestAdministrative = scoredAdministrative[0];
-
-  let candidate: Representative | undefined;
-  let matchScore = 0;
-
-  if (bestMinisterial && bestMinisterial.score >= 40) {
-    candidate = bestMinisterial.rep;
-    matchScore = bestMinisterial.score;
-  } else if (bestAdministrative && bestAdministrative.score >= 30) {
-    candidate = bestAdministrative.rep;
-    matchScore = bestAdministrative.score;
-  } else if (bestMinisterial) {
-    candidate = bestMinisterial.rep;
-    matchScore = bestMinisterial.score;
-  } else if (bestAdministrative) {
-    candidate = bestAdministrative.rep;
-    matchScore = bestAdministrative.score;
+  for (const rep of activeReps) {
+    const { score, reason } = getRepresentativeScore(category, rep, state, district, constituency);
+    if (score > highestScore) {
+      highestScore = score;
+      bestRep = rep;
+      bestReason = reason;
+    }
   }
 
-  if (!candidate) {
+  if (bestRep && highestScore > 30) {
     return {
-      isVerified: false,
-      matchScore: 0,
-      routingReason: `No active contact registered for district: ${district}`,
+      representative: bestRep,
+      isVerified: bestRep.verification_status === 'VERIFIED',
+      matchScore: Math.min(100, highestScore),
+      routingReason: bestReason || `Routed to ${bestRep.organization}`,
+      matchedMinistry: bestRep.ministry || bestRep.organization,
+      matchedLevel: bestRep.level || 'CENTRAL_MINISTRY',
     };
   }
 
-  const isMinister = isMinisterOrMLA(candidate.role);
-  const isVerified = candidate.verification_status === 'VERIFIED';
-
-  if (isMinister && matchScore >= 40) {
-    return {
-      representative: candidate,
-      isVerified,
-      matchScore: Math.min(matchScore + 20, 100),
-      routingReason: `Routed to ${candidate.role} ${candidate.name} (${candidate.organization}) — portfolio covers ${category}. Your grievance has been escalated to the state-level authority responsible for ${category} issues in Tamil Nadu.`,
-    };
-  }
+  // Fallback to CPGRAMS / Public Grievance Nodal Cell
+  const cpgramsRep = activeReps.find(r => 
+    r.organization.toLowerCase().includes('darpg') || 
+    r.organization.toLowerCase().includes('public grievance') ||
+    r.name.toLowerCase().includes('grievance')
+  ) || activeReps[0];
 
   return {
-    representative: candidate,
-    isVerified,
-    matchScore: Math.min(matchScore + 10, 100),
-    routingReason: `Matched verified authority (${candidate.organization}) based on ${district} & category jurisdiction.`,
+    representative: cpgramsRep,
+    isVerified: cpgramsRep.verification_status === 'VERIFIED',
+    matchScore: 65,
+    routingReason: 'Auto-routed to Central Public Grievance Nodal Authority (DARPG / CPGRAMS)',
+    matchedMinistry: 'Department of Administrative Reforms and Public Grievances',
+    matchedLevel: 'CENTRAL_AGENCY',
   };
 }

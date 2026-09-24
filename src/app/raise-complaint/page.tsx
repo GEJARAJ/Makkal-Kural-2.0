@@ -38,11 +38,12 @@ export default function RaiseComplaintPage() {
   const totalSteps = 7;
 
   // Form State
-  const [category, setCategory] = useState('roads');
-  const [subcategory, setSubcategory] = useState('Potholes');
+  const [category, setCategory] = useState('highways-roads');
+  const [subcategory, setSubcategory] = useState('National Highway Potholes / Damage');
+  const [state, setState] = useState('Tamil Nadu');
   const [district, setDistrict] = useState('Chennai');
   const [city, setCity] = useState('Chennai');
-  const [constituency, setConstituency] = useState('Thousand Lights');
+  const [constituency, setConstituency] = useState('Chennai Central');
   const [locality, setLocality] = useState('');
   const [latitude, setLatitude] = useState<number | undefined>();
   const [longitude, setLongitude] = useState<number | undefined>();
@@ -87,12 +88,12 @@ export default function RaiseComplaintPage() {
   useEffect(() => {
     let cancelled = false;
     const computeRouting = async () => {
-      const result = await routeComplaintToRepresentative(category, district, constituency);
+      const result = await routeComplaintToRepresentative(category, state, district, constituency);
       if (!cancelled) setRouting(result);
     };
     computeRouting();
     return () => { cancelled = true; };
-  }, [category, district, constituency]);
+  }, [category, state, district, constituency]);
 
   // Validation per step
   const validateCurrentStep = (): boolean => {
@@ -158,10 +159,11 @@ export default function RaiseComplaintPage() {
       formData.append('payload', JSON.stringify({
         category,
         subcategory,
-        state: 'Tamil Nadu',
+        state,
         district,
         city,
         constituency,
+        parliamentaryConstituency: constituency,
         locality,
         latitude,
         longitude,
@@ -199,10 +201,11 @@ export default function RaiseComplaintPage() {
             reference_number: json.referenceNumber,
             category,
             subcategory,
-            state: 'Tamil Nadu',
+            state,
             district,
             city,
             constituency,
+            parliamentary_constituency: constituency,
             locality,
             latitude,
             longitude,
@@ -476,6 +479,7 @@ export default function RaiseComplaintPage() {
 
           {currentStep === 2 && (
             <StepLocation
+              state={state}
               district={district}
               constituency={constituency}
               city={city}
@@ -484,6 +488,7 @@ export default function RaiseComplaintPage() {
               longitude={longitude}
               errors={errors}
               onChange={(fields) => {
+                if (fields.state !== undefined) setState(fields.state);
                 if (fields.district !== undefined) setDistrict(fields.district);
                 if (fields.constituency !== undefined) setConstituency(fields.constituency);
                 if (fields.city !== undefined) setCity(fields.city);

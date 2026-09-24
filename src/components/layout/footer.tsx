@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/components/providers/language-provider';
-import { ShieldCheck, PhoneCall, ExternalLink, Heart } from 'lucide-react';
+import { Landmark, PhoneCall, ExternalLink, ShieldCheck } from 'lucide-react';
 
 export function Footer() {
   const { t } = useLanguage();
@@ -16,11 +16,11 @@ export function Footer() {
           {/* Brand & Neutrality Statement */}
           <div className="space-y-4 lg:col-span-1">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white">
-                <ShieldCheck className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-lg bg-navy-800 border border-navy-700 flex items-center justify-center text-white">
+                <Landmark className="w-5 h-5 text-amber-400" />
               </div>
-              <span className="font-bold text-lg tracking-tight font-tamil">
-                {t.brand.tamilName}
+              <span className="font-bold text-lg tracking-tight">
+                {t.brand.name}
               </span>
             </div>
             <p className="text-xs text-navy-400 leading-relaxed">
@@ -28,16 +28,16 @@ export function Footer() {
             </p>
             <div className="p-3 bg-navy-900/80 rounded-lg border border-navy-800 text-[11px] text-navy-300">
               <span className="font-semibold text-emerald-400 block mb-1">
-                {t.footer.neutralityTitle}
+                Central Civic Transparency
               </span>
-              {t.footer.neutralityDesc}
+              Independent, politically neutral civic routing platform aligning citizen petitions with Government of India ministries and Members of Parliament.
             </div>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-3">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-navy-300">
-              {t.footer.quickLinks}
+              Navigation
             </h4>
             <ul className="space-y-2 text-xs text-navy-400">
               <li>
@@ -68,61 +68,87 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Legal & Governance */}
+          {/* National Portals & Governance */}
           <div className="space-y-3">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-navy-300">
-              {t.footer.legal}
+              Central Portals
             </h4>
             <ul className="space-y-2 text-xs text-navy-400">
               <li>
+                <a
+                  href="https://pgportal.gov.in"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1 hover:text-emerald-400 transition-colors"
+                >
+                  <span>CPGRAMS (Public Grievance Portal)</span>
+                  <ExternalLink className="w-3 h-3 text-navy-500" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://sansad.in"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1 hover:text-emerald-400 transition-colors"
+                >
+                  <span>Sansad (Parliament of India)</span>
+                  <ExternalLink className="w-3 h-3 text-navy-500" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://india.gov.in"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1 hover:text-emerald-400 transition-colors"
+                >
+                  <span>National Portal of India</span>
+                  <ExternalLink className="w-3 h-3 text-navy-500" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://railmadad.indianrailways.gov.in"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1 hover:text-emerald-400 transition-colors"
+                >
+                  <span>RailMadad Grievance</span>
+                  <ExternalLink className="w-3 h-3 text-navy-500" />
+                </a>
+              </li>
+              <li>
                 <Link href="/privacy" className="hover:text-emerald-400 transition-colors">
-                  {t.footer.privacy}
+                  Privacy Policy
                 </Link>
               </li>
               <li>
                 <Link href="/terms" className="hover:text-emerald-400 transition-colors">
-                  {t.footer.terms}
+                  Terms of Service
                 </Link>
-              </li>
-              <li>
-                <a
-                  href="https://tnega.tn.gov.in"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1 hover:text-emerald-400 transition-colors"
-                >
-                  <span>TNeGA Portal</span>
-                  <ExternalLink className="w-3 h-3 text-navy-500" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://cmhelpline.tnega.org"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1 hover:text-emerald-400 transition-colors"
-                >
-                  <span>CM Helpline (1100)</span>
-                  <ExternalLink className="w-3 h-3 text-navy-500" />
-                </a>
               </li>
             </ul>
           </div>
 
-          {/* Emergency & Helplines */}
+          {/* Emergency & National Helplines */}
           <div className="space-y-3">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-navy-300 flex items-center gap-1.5">
-              <PhoneCall className="w-3.5 h-3.5 text-red-400" />
-              {t.footer.helpline}
+              <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
+              National Helplines
             </h4>
             <div className="space-y-2 text-xs">
               <div className="p-2.5 rounded bg-navy-900 border border-navy-800">
-                <span className="text-red-400 font-bold block">{t.footer.emergency}</span>
-                <span className="text-navy-400 text-[11px]">All Emergency Services (Fire, Ambulance, Police)</span>
+                <span className="text-red-400 font-bold block">112 — National Emergency</span>
+                <span className="text-navy-400 text-[11px]">All-in-One Emergency (Police, Fire, Ambulance)</span>
               </div>
               <div className="p-2.5 rounded bg-navy-900 border border-navy-800">
-                <span className="text-emerald-400 font-bold block">{t.footer.cmHelpline}</span>
-                <span className="text-navy-400 text-[11px]">Tamil Nadu Government Grievance Redressal</span>
+                <span className="text-emerald-400 font-bold block">1915 — National Consumer Helpline</span>
+                <span className="text-navy-400 text-[11px]">Consumer Grievances & Product Redressal</span>
+              </div>
+              <div className="p-2.5 rounded bg-navy-900 border border-navy-800">
+                <span className="text-cyan-400 font-bold block">139 — RailMadad Railway Helpline</span>
+                <span className="text-navy-400 text-[11px]">Passenger Security & Train Assistance</span>
               </div>
             </div>
           </div>
@@ -131,9 +157,10 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-navy-900/80 flex flex-col sm:flex-row items-center justify-between text-xs text-navy-500 gap-4">
-          <p>© {new Date().getFullYear()} Makkal Kural (மக்கள் குரல்). {t.footer.rights}</p>
-          <div className="flex items-center gap-1">
-            <span>Built for public civic good</span>
+          <p>© {new Date().getFullYear()} Makkal Kural 2.0 (மக்கள் குரல் 2.0 / जन आवाज 2.0). All rights reserved.</p>
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>National Public Grievance Routing System Active</span>
           </div>
         </div>
       </div>
