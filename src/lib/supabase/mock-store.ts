@@ -417,6 +417,8 @@ export const INITIAL_COMPLAINTS: Complaint[] = [
     constituency: 'Sriperumbudur',
     parliamentary_constituency: 'Sriperumbudur',
     locality: 'NH-48 Km 54 Marker',
+    latitude: 12.9675,
+    longitude: 79.9419,
     severity: 'HIGH',
     status: 'IN_PROGRESS',
     assigned_representative_id: 'a0000001-0000-0000-0000-000000000002',
@@ -424,6 +426,10 @@ export const INITIAL_COMPLAINTS: Complaint[] = [
     submitter_name: 'Venkatesh Ramanathan',
     submitter_email: 'venkatesh.r@example.com',
     submitter_phone: '+91 98401 23456',
+    upvotes_count: 87,
+    sla_deadline: '2026-02-24T10:00:00Z',
+    sla_escalated: false,
+    escalation_level: 'LEVEL_1_NODAL',
     created_at: '2026-02-10T10:00:00Z',
     updated_at: '2026-02-12T14:30:00Z',
     updates: [
@@ -471,14 +477,22 @@ export const INITIAL_COMPLAINTS: Complaint[] = [
     constituency: 'New Delhi',
     parliamentary_constituency: 'New Delhi',
     locality: 'New Delhi Railway Station Paharganj Gate',
+    latitude: 28.6429,
+    longitude: 77.2195,
     severity: 'MEDIUM',
-    status: 'ACKNOWLEDGED',
+    status: 'RESOLVED',
     assigned_representative_id: 'a0000001-0000-0000-0000-000000000003',
     is_anonymous: false,
     submitter_name: 'Anjali Sharma',
     submitter_email: 'anjali.s@example.com',
+    upvotes_count: 142,
+    sla_deadline: '2026-03-01T09:00:00Z',
+    sla_escalated: false,
+    resolution_proof_url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80',
+    citizen_rating: 5,
+    citizen_feedback: 'Elevator and accessibility ramps were repaired within 4 days. Excellent quick redressal by Northern Railways!',
     created_at: '2026-02-15T09:00:00Z',
-    updated_at: '2026-02-15T11:00:00Z',
+    updated_at: '2026-02-19T11:00:00Z',
     updates: [
       {
         id: 'u3',
@@ -487,6 +501,144 @@ export const INITIAL_COMPLAINTS: Complaint[] = [
         message: 'Acknowledged by Northern Railway Division Grievance Cell.',
         is_public: true,
         created_at: '2026-02-15T11:00:00Z',
+      },
+      {
+        id: 'u4',
+        complaint_id: 'c0000001-0000-0000-0000-000000000002',
+        status: 'RESOLVED',
+        message: 'Elevator motor replaced and ramps safety-certified. Issue resolved.',
+        is_public: true,
+        created_at: '2026-02-19T11:00:00Z',
+      }
+    ]
+  },
+  {
+    id: 'c0000001-0000-0000-0000-000000000003',
+    reference_number: 'MK2-2026-JAL-003',
+    category: 'water-jal-shakti',
+    subcategory: 'Jal Jeevan Mission Pipeline Leakage',
+    ministry: 'Ministry of Jal Shakti',
+    title: 'Drinking water pipeline contamination near Whitefield, Bengaluru',
+    description: 'Fresh drinking water supply pipe has breached adjacent to stormwater drain, leading to foul-smelling turbid water entering 300+ residential households.',
+    original_language: 'en',
+    state: 'Karnataka',
+    district: 'Bengaluru Urban',
+    city: 'Bengaluru',
+    constituency: 'Bangalore South',
+    parliamentary_constituency: 'Bangalore South',
+    locality: 'Whitefield Main Road, Kadugodi',
+    latitude: 12.9698,
+    longitude: 77.7499,
+    severity: 'URGENT',
+    status: 'IN_PROGRESS',
+    assigned_representative_id: 'a0000001-0000-0000-0000-000000000004',
+    is_anonymous: false,
+    submitter_name: 'Kiran Gowda',
+    submitter_email: 'kiran.gowda@example.com',
+    upvotes_count: 215,
+    sla_deadline: '2026-02-23T12:00:00Z',
+    sla_escalated: true,
+    escalation_level: 'LEVEL_2_JOINT_SECRETARY',
+    created_at: '2026-02-16T12:00:00Z',
+    updated_at: '2026-02-18T16:00:00Z',
+    updates: [
+      {
+        id: 'u5',
+        complaint_id: 'c0000001-0000-0000-0000-000000000003',
+        status: 'SUBMITTED',
+        message: 'Submitted to Jal Shakti Nodal desk.',
+        is_public: true,
+        created_at: '2026-02-16T12:00:00Z',
+      },
+      {
+        id: 'u6',
+        complaint_id: 'c0000001-0000-0000-0000-000000000003',
+        status: 'IN_PROGRESS',
+        message: 'Escalated to Joint Secretary level due to urgent public health alert.',
+        is_public: true,
+        created_at: '2026-02-18T16:00:00Z',
+      }
+    ]
+  },
+  {
+    id: 'c0000001-0000-0000-0000-000000000004',
+    reference_number: 'MK2-2026-PWR-004',
+    category: 'power-energy',
+    subcategory: 'High Voltage Transformer Sparking & Sagging Cables',
+    ministry: 'Ministry of Power',
+    title: 'Exposed 11kV transformer sparking continuously near Marine Drive, Mumbai',
+    description: 'High voltage distribution transformer sparking during sea breeze humidity. Immediate fire hazard near dense pedestrian walkway.',
+    original_language: 'en',
+    state: 'Maharashtra',
+    district: 'Mumbai City',
+    city: 'Mumbai',
+    constituency: 'Mumbai South',
+    parliamentary_constituency: 'Mumbai South',
+    locality: 'Marine Drive Promenade Opp. Chowpatty',
+    latitude: 18.9438,
+    longitude: 72.8232,
+    severity: 'URGENT',
+    status: 'RESOLVED',
+    assigned_representative_id: 'a0000001-0000-0000-0000-000000000005',
+    is_anonymous: false,
+    submitter_name: 'Rajesh Parekh',
+    submitter_email: 'r.parekh@example.com',
+    upvotes_count: 340,
+    sla_deadline: '2026-02-21T18:00:00Z',
+    sla_escalated: false,
+    resolution_proof_url: 'https://images.unsplash.com/photo-1508873696983-2df570464756?auto=format&fit=crop&w=600&q=80',
+    citizen_rating: 5,
+    citizen_feedback: 'Emergency team isolated the faulty transformer and insulated all wires within 6 hours. Superb response!',
+    created_at: '2026-02-18T18:00:00Z',
+    updated_at: '2026-02-19T00:30:00Z',
+    updates: [
+      {
+        id: 'u7',
+        complaint_id: 'c0000001-0000-0000-0000-000000000004',
+        status: 'RESOLVED',
+        message: 'Faulty insulator bushing replaced, load re-balanced.',
+        is_public: true,
+        created_at: '2026-02-19T00:30:00Z',
+      }
+    ]
+  },
+  {
+    id: 'c0000001-0000-0000-0000-000000000005',
+    reference_number: 'MK2-2026-ENV-005',
+    category: 'environment-pollution',
+    subcategory: 'Industrial Effluent Discharge in Ganga Tributary',
+    ministry: 'Ministry of Environment, Forest and Climate Change',
+    title: 'Untreated chemical foam discharge in Assi River basin, Varanasi',
+    description: 'Chemical industrial effluents discharging directly without secondary treatment, generating toxic foam and severe ecological distress.',
+    original_language: 'en',
+    state: 'Uttar Pradesh',
+    district: 'Varanasi',
+    city: 'Varanasi',
+    constituency: 'Varanasi',
+    parliamentary_constituency: 'Varanasi',
+    locality: 'Assi Ghat Confluence Point',
+    latitude: 25.2820,
+    longitude: 83.0062,
+    severity: 'HIGH',
+    status: 'IN_PROGRESS',
+    assigned_representative_id: 'a0000001-0000-0000-0000-000000000001',
+    is_anonymous: false,
+    submitter_name: 'Dr. Amit Tripathi',
+    submitter_email: 'amit.tripathi@example.com',
+    upvotes_count: 512,
+    sla_deadline: '2026-02-28T14:00:00Z',
+    sla_escalated: true,
+    escalation_level: 'LEVEL_3_MINISTER',
+    created_at: '2026-02-14T14:00:00Z',
+    updated_at: '2026-02-17T11:00:00Z',
+    updates: [
+      {
+        id: 'u8',
+        complaint_id: 'c0000001-0000-0000-0000-000000000005',
+        status: 'IN_PROGRESS',
+        message: 'CPCB and Namami Gange surveillance team issued notice to 3 dyeing units.',
+        is_public: true,
+        created_at: '2026-02-17T11:00:00Z',
       }
     ]
   }
@@ -495,6 +647,7 @@ export const INITIAL_COMPLAINTS: Complaint[] = [
 class MockStore {
   private representatives: Representative[] = [...INITIAL_REPRESENTATIVES];
   private complaints: Complaint[] = [...INITIAL_COMPLAINTS];
+  private upvotedFingerprints: Set<string> = new Set();
 
   getRepresentatives(): Representative[] {
     return this.representatives;
@@ -527,6 +680,13 @@ class MockStore {
 
   addComplaint(complaint: Complaint): void {
     const idx = this.complaints.findIndex(c => c.id === complaint.id);
+    if (!complaint.upvotes_count) complaint.upvotes_count = 1;
+    if (!complaint.sla_deadline) {
+      // 7 days for URGENT, 14 days for HIGH, 30 days for others
+      const days = complaint.severity === 'URGENT' ? 7 : complaint.severity === 'HIGH' ? 14 : 30;
+      const deadline = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+      complaint.sla_deadline = deadline.toISOString();
+    }
     if (idx >= 0) {
       this.complaints[idx] = complaint;
     } else {
@@ -534,13 +694,40 @@ class MockStore {
     }
   }
 
-  updateComplaintStatus(id: string, status: string, message?: string, repId?: string): boolean {
+  upvoteComplaint(idOrRef: string, userFingerprint?: string): { success: boolean; upvotes: number; message: string } {
+    const complaint = this.complaints.find(c => c.id === idOrRef || c.reference_number.toLowerCase() === idOrRef.toLowerCase());
+    if (!complaint) return { success: false, upvotes: 0, message: 'Complaint not found' };
+
+    const key = `${userFingerprint || 'anon'}_${complaint.id}`;
+    if (userFingerprint && this.upvotedFingerprints.has(key)) {
+      return { success: false, upvotes: complaint.upvotes_count || 1, message: 'You have already endorsed this complaint' };
+    }
+
+    if (userFingerprint) this.upvotedFingerprints.add(key);
+    complaint.upvotes_count = (complaint.upvotes_count || 0) + 1;
+    complaint.updated_at = new Date().toISOString();
+
+    return { success: true, upvotes: complaint.upvotes_count, message: 'Endorsement recorded successfully' };
+  }
+
+  submitCitizenRating(idOrRef: string, rating: number, feedback?: string): boolean {
+    const complaint = this.complaints.find(c => c.id === idOrRef || c.reference_number.toLowerCase() === idOrRef.toLowerCase());
+    if (!complaint) return false;
+
+    complaint.citizen_rating = rating;
+    if (feedback) complaint.citizen_feedback = feedback;
+    complaint.updated_at = new Date().toISOString();
+    return true;
+  }
+
+  updateComplaintStatus(id: string, status: string, message?: string, repId?: string, resolutionProofUrl?: string): boolean {
     const complaint = this.complaints.find(c => c.id === id);
     if (!complaint) return false;
 
     complaint.status = status as any;
     complaint.updated_at = new Date().toISOString();
     if (repId) complaint.assigned_representative_id = repId;
+    if (resolutionProofUrl) complaint.resolution_proof_url = resolutionProofUrl;
 
     if (message) {
       if (!complaint.updates) complaint.updates = [];
@@ -558,3 +745,4 @@ class MockStore {
 }
 
 export const mockStore = new MockStore();
+

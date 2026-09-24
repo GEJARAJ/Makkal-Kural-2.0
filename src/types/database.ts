@@ -129,9 +129,17 @@ export interface Complaint {
   submitter_email: string;
   submitter_phone?: string;
   submitter_language?: PreferredLanguage;
+  upvotes_count?: number;
+  sla_deadline?: string;
+  sla_escalated?: boolean;
+  escalation_level?: 'LEVEL_1_NODAL' | 'LEVEL_2_JOINT_SECRETARY' | 'LEVEL_3_MINISTER';
+  resolution_proof_url?: string;
+  citizen_rating?: number;
+  citizen_feedback?: string;
   attachments?: ComplaintAttachment[];
   delivery_logs?: DeliveryLog[];
   updates?: ComplaintUpdate[];
   created_at: string;
   updated_at: string;
 }
+

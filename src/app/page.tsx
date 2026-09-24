@@ -105,6 +105,13 @@ export default function LandingPage() {
                   </Button>
                 </Link>
 
+                <Link href="/heatmap" className="w-full sm:w-auto">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto text-sm font-semibold bg-white dark:bg-navy-900 border-navy-300">
+                    <Landmark className="w-4 h-4 mr-2 text-emerald-600 dark:text-emerald-400" />
+                    {isTamil ? 'தேசிய வரைபடம்' : (isHindi ? 'राष्ट्रीय मानचित्र' : 'GIS Heatmap')}
+                  </Button>
+                </Link>
+
                 <Link href="/representatives" className="w-full sm:w-auto">
                   <Button variant="outline" size="lg" className="w-full sm:w-auto text-sm font-semibold bg-white dark:bg-navy-900">
                     <Building2 className="w-4 h-4 mr-2 text-navy-600 dark:text-navy-400" />

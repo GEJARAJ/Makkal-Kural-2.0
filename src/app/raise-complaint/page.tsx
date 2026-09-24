@@ -544,6 +544,7 @@ export default function RaiseComplaintPage() {
             <StepEvidence
               attachments={attachments}
               onChange={(atts) => setAttachments(atts)}
+              onApplySeverity={(s) => setSeverity(s)}
             />
           )}
 

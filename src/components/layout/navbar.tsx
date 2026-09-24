@@ -44,6 +44,7 @@ export function Navbar() {
     { href: '/', label: t.nav.home, icon: null },
     { href: '/raise-complaint', label: t.nav.raiseComplaint, icon: PlusCircle, highlight: true },
     { href: '/track', label: t.nav.track, icon: Search },
+    { href: '/heatmap', label: language === 'ta' ? 'தேசிய வரைபடம்' : language === 'hi' ? 'राष्ट्रीय मानचित्र' : 'GIS Heatmap', icon: Landmark },
     { href: '/representatives', label: t.nav.representatives, icon: Building2 },
     { href: '/dashboard', label: t.nav.dashboard, icon: LayoutDashboard },
   ];

@@ -513,3 +513,76 @@ export async function createAuditLog(log: AuditLog): Promise<AuditLog | null> {
     return log;
   }
 }
+
+export async function upvoteComplaint(idOrRef: string, fingerprint?: string): Promise<{ success: boolean; upvotes: number; message: string }> {
+  const client = getDb();
+  if (!isSupabaseConfigured || !client) {
+    return mockStore.upvoteComplaint(idOrRef, fingerprint);
+  }
+
+  try {
+    const complaint = await getComplaintByReference(idOrRef);
+    if (!complaint) return { success: false, upvotes: 0, message: 'Complaint not found' };
+
+    const newCount = (complaint.upvotes_count || 0) + 1;
+    const { error } = await client
+      .from('complaints')
+      .update({ upvotes_count: newCount, updated_at: new Date().toISOString() })
+      .eq('id', complaint.id);
+
+    if (error) {
+      return mockStore.upvoteComplaint(idOrRef, fingerprint);
+    }
+    return { success: true, upvotes: newCount, message: 'Endorsement recorded successfully' };
+  } catch {
+    return mockStore.upvoteComplaint(idOrRef, fingerprint);
+  }
+}
+
+export async function submitCitizenFeedback(idOrRef: string, rating: number, feedback?: string): Promise<boolean> {
+  const client = getDb();
+  if (!isSupabaseConfigured || !client) {
+    return mockStore.submitCitizenRating(idOrRef, rating, feedback);
+  }
+
+  try {
+    const complaint = await getComplaintByReference(idOrRef);
+    if (!complaint) return false;
+
+    const { error } = await client
+      .from('complaints')
+      .update({
+        citizen_rating: rating,
+        citizen_feedback: feedback || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', complaint.id);
+
+    if (error) return mockStore.submitCitizenRating(idOrRef, rating, feedback);
+    return true;
+  } catch {
+    return mockStore.submitCitizenRating(idOrRef, rating, feedback);
+  }
+}
+
+export async function getHeatmapComplaints(): Promise<Complaint[]> {
+  const client = getDb();
+  if (!isSupabaseConfigured || !client) {
+    return mockStore.getComplaints();
+  }
+
+  try {
+    const { data, error } = await client
+      .from('complaints')
+      .select('id, reference_number, category, subcategory, ministry, title, state, district, city, constituency, locality, latitude, longitude, severity, status, upvotes_count, created_at')
+      .not('latitude', 'is', null);
+
+    if (error || !data || data.length === 0) {
+      return mockStore.getComplaints();
+    }
+    return data as Complaint[];
+  } catch {
+    return mockStore.getComplaints();
+  }
+}
+

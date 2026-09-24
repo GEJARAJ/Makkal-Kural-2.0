@@ -217,3 +217,6 @@ export function getCategoryById(id: string): CivicCategory | undefined {
 export function getAllCategories(): CivicCategory[] {
   return CIVIC_CATEGORIES;
 }
+
+export const CENTRAL_CATEGORIES = CIVIC_CATEGORIES;
+
