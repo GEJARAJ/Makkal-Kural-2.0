@@ -8,8 +8,19 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { buildXShareUrl, buildXOfficialReplyUrl } from '@/lib/x-share-service';
+import dynamic from 'next/dynamic';
 import { formatDate } from '@/lib/utils';
-import { ComplaintMap } from '@/components/maps/complaint-map';
+const ComplaintMap = dynamic(
+  () => import('@/components/maps/complaint-map').then((mod) => mod.ComplaintMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[280px] rounded-xl bg-navy-50/70 dark:bg-navy-900/70 flex items-center justify-center text-xs text-navy-500">
+        Loading map location...
+      </div>
+    ),
+  }
+);
 import { exportComplaintPDF } from '@/lib/export-service';
 import { 
   CheckCircle2, 
