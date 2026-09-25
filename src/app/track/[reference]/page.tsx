@@ -7,7 +7,7 @@ import { Complaint, ComplaintStatus, ComplaintAttachment } from '@/types/databas
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { buildXShareUrl, buildXOfficialReplyUrl } from '@/lib/x-share-service';
+import { buildXShareUrl, buildXOfficialReplyUrl, openXIntentOrApp } from '@/lib/x-share-service';
 import dynamic from 'next/dynamic';
 import { formatDate } from '@/lib/utils';
 const ComplaintMap = dynamic(
@@ -394,20 +394,25 @@ export default function TrackDetailPage({
               : isTamil ? `நானும் பாதிக்கப்பட்டுள்ளேன் (${upvotes})` : `I Am Also Affected (${upvotes})`}
           </Button>
 
-          <a href={xShareUrl} target="_blank" rel="noopener noreferrer">
-            <Button variant="secondary" size="sm" className="text-xs bg-navy-800 text-white hover:bg-navy-700 border border-navy-700">
-              <Share2 className="w-3.5 h-3.5 mr-1 text-sky-400" />
-              {isTamil ? 'X-ல் பகிர்க' : 'Post to X'}
-            </Button>
-          </a>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => openXIntentOrApp(complaint, complaint.assigned_representative)}
+            className="text-xs bg-navy-800 text-white hover:bg-navy-700 border border-navy-700"
+          >
+            <Share2 className="w-3.5 h-3.5 mr-1 text-sky-400" />
+            {isTamil ? 'X (Twitter)-ல் பகிர்க' : 'Post to X'}
+          </Button>
 
           {complaint.assigned_representative?.x_handle && (
-            <a href={xReplyUrl} target="_blank" rel="noopener noreferrer">
-              <Button size="sm" className="text-xs bg-emerald-600 text-white hover:bg-emerald-700">
-                <Send className="w-3.5 h-3.5 mr-1" />
-                {isTamil ? 'அதிகாரியை குறிப்பிடுக' : 'Tag Official'}
-              </Button>
-            </a>
+            <Button
+              size="sm"
+              onClick={() => openXIntentOrApp(complaint, complaint.assigned_representative)}
+              className="text-xs bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              <Send className="w-3.5 h-3.5 mr-1" />
+              {isTamil ? 'அதிகாரியை குறிப்பிடுக' : 'Tag Official'}
+            </Button>
           )}
         </div>
       </div>

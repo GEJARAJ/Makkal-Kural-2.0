@@ -67,6 +67,13 @@ CREATE TABLE IF NOT EXISTS complaints (
   submitter_email TEXT NOT NULL,
   submitter_phone TEXT,
   submitter_language TEXT DEFAULT 'en',
+  upvotes_count INTEGER NOT NULL DEFAULT 1,
+  sla_deadline TIMESTAMPTZ,
+  sla_escalated BOOLEAN NOT NULL DEFAULT FALSE,
+  escalation_level TEXT DEFAULT 'LEVEL_1_NODAL', -- 'LEVEL_1_NODAL', 'LEVEL_2_JOINT_SECRETARY', 'LEVEL_3_MINISTER'
+  resolution_proof_url TEXT,
+  citizen_rating INTEGER,
+  citizen_feedback TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
