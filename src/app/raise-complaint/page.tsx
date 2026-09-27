@@ -28,7 +28,8 @@ import { StepPreview } from '@/components/wizard/step-preview';
     Sparkles,
     ShieldCheck,
     Crown,
-    AlertCircle
+    AlertCircle,
+    MapPin
   } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -69,6 +70,25 @@ export default function RaiseComplaintPage() {
   const [submitterLang, setSubmitterLang] = useState<PreferredLanguage>(language);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [legalConfirmed, setLegalConfirmed] = useState(false);
+
+  // Load saved profile if available
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('mk_user_profile');
+        if (saved) {
+          const p = JSON.parse(saved);
+          if (p.name) setSubmitterName(p.name);
+          if (p.email) setSubmitterEmail(p.email);
+          if (p.phone) setSubmitterPhone(p.phone);
+          if (p.state) setState(p.state);
+          if (p.district) setDistrict(p.district);
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
 
   // Flow & submission state
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -436,26 +456,52 @@ export default function RaiseComplaintPage() {
               );
             })()}
 
+            {/* Email Petition Copy Confirmation Banner */}
+            {submitterEmail && (
+              <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-center gap-3 text-xs text-emerald-900 dark:text-emerald-200">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                <div>
+                  <span className="font-bold block">
+                    {isTamil ? 'அதிகாரப்பூர்வ மனு நகல் உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்டது' : 'Official Petition Copy Dispatched to Your Email'}
+                  </span>
+                  <span className="text-[11px] text-emerald-700 dark:text-emerald-300">
+                    {isTamil ? `மனுவின் முழு நகல் மற்றும் குறிப்பு எண் ${submitterEmail} முகவரிக்கு அனுப்பப்பட்டுள்ளது.` : `A full petition copy with reference #${submitSuccess.referenceNumber} was sent to ${submitterEmail}.`}
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Actions Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
               
               {/* Track Online */}
               <Link href={`/track/${submitSuccess.referenceNumber}`} className="w-full">
-                <Button variant="primary" className="w-full">
+                <Button variant="primary" className="w-full text-xs">
                   <Search className="w-4 h-4 mr-1.5" />
-                  {isTamil ? 'புகார் நிலையை காண்க' : 'Track Grievance Online'}
+                  {isTamil ? 'புகார் நிலையை காண்க' : 'Track Grievance'}
+                </Button>
+              </Link>
+
+              {/* View on GIS Heatmap */}
+              <Link href="/heatmap" className="w-full">
+                <Button variant="civic" className="w-full text-xs bg-emerald-700 hover:bg-emerald-800 text-white">
+                  <MapPin className="w-4 h-4 mr-1.5" />
+                  {isTamil ? 'வரைபடத்தில் காண்க' : 'View on GIS Heatmap'}
                 </Button>
               </Link>
 
               {/* Return to Raise */}
               <Link
                 href="/raise-complaint"
-                onClick={() => setSubmitSuccess(null)}
+                onClick={() => {
+                  setSubmitSuccess(null);
+                  setCurrentStep(1);
+                }}
                 className="w-full"
               >
-                <Button variant="outline" className="w-full border-navy-300 text-navy-800 hover:bg-navy-50">
-                  <PlusCircle className="w-4 h-4 mr-1.5 text-emerald-600" />
-                  {isTamil ? 'மற்றொரு புதிய புகார்' : 'Raise Another Complaint'}
+                <Button variant="outline" className="w-full text-xs border-navy-300 dark:border-navy-700 text-navy-800 dark:text-navy-200">
+                  <PlusCircle className="w-4 h-4 mr-1.5 text-emerald-600 dark:text-emerald-400" />
+                  {isTamil ? 'மற்றொரு புதிய புகார்' : 'File Another'}
                 </Button>
               </Link>
             </div>

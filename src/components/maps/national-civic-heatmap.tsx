@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/components/providers/language-provider';
 import { Complaint, SeverityLevel } from '@/types/database';
 import { CENTRAL_CATEGORIES } from '@/lib/constants/categories';
+import { getLocationCoordinates } from '@/lib/constants/locations';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
@@ -48,10 +49,13 @@ export function NationalCivicHeatmap({ complaints, height = '700px' }: HeatmapPr
   }, []);
 
   const filteredComplaints = useMemo(() => {
-    return complaints.filter((c) => {
-      // Must have coordinates
-      if (!c.latitude || !c.longitude) return false;
-
+    return complaints.map((c) => {
+      if (!c.latitude || !c.longitude) {
+        const coords = getLocationCoordinates(c.state, c.district);
+        return { ...c, latitude: coords.lat, longitude: coords.lng };
+      }
+      return c;
+    }).filter((c) => {
       if (selectedCategory !== 'all' && c.category !== selectedCategory) return false;
       if (selectedSeverity !== 'all' && c.severity !== selectedSeverity) return false;
 
@@ -103,7 +107,7 @@ export function NationalCivicHeatmap({ complaints, height = '700px' }: HeatmapPr
   return (
     <div className="space-y-4">
       {/* Filters Bar */}
-      <div className="p-4 rounded-xl bg-white border border-navy-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+      <div className="p-4 rounded-xl bg-white dark:bg-navy-900 border border-navy-200 dark:border-navy-800 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           {/* Search */}
           <div className="relative">
@@ -113,7 +117,7 @@ export function NationalCivicHeatmap({ complaints, height = '700px' }: HeatmapPr
               placeholder={isTamil ? 'மாவட்டம், மாநிலம், எண்...' : 'Search city, state, ref...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-3 py-1.5 text-xs rounded-lg border border-navy-200 bg-navy-50/50 text-navy-900 focus:outline-emerald-600 w-44 sm:w-56"
+              className="pl-9 pr-3 py-1.5 text-xs rounded-lg border border-navy-200 dark:border-navy-700 bg-navy-50/50 dark:bg-navy-950 text-navy-900 dark:text-white focus:outline-emerald-600 w-44 sm:w-56"
             />
           </div>
 
@@ -121,7 +125,7 @@ export function NationalCivicHeatmap({ complaints, height = '700px' }: HeatmapPr
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-1.5 text-xs rounded-lg border border-navy-200 bg-navy-50/50 text-navy-900 focus:outline-emerald-600"
+            className="px-3 py-1.5 text-xs rounded-lg border border-navy-200 dark:border-navy-700 bg-navy-50/50 dark:bg-navy-950 text-navy-900 dark:text-white focus:outline-emerald-600"
           >
             <option value="all">{isTamil ? 'அனைத்து துறைகள்' : 'All Union Portfolios'}</option>
             {CENTRAL_CATEGORIES.map((cat) => (
@@ -135,7 +139,7 @@ export function NationalCivicHeatmap({ complaints, height = '700px' }: HeatmapPr
           <select
             value={selectedSeverity}
             onChange={(e) => setSelectedSeverity(e.target.value)}
-            className="px-3 py-1.5 text-xs rounded-lg border border-navy-200 bg-navy-50/50 text-navy-900 focus:outline-emerald-600"
+            className="px-3 py-1.5 text-xs rounded-lg border border-navy-200 dark:border-navy-700 bg-navy-50/50 dark:bg-navy-950 text-navy-900 dark:text-white focus:outline-emerald-600"
           >
             <option value="all">{isTamil ? 'அனைத்து அவசர நிலைகள்' : 'All Severities'}</option>
             <option value="URGENT">🔴 Urgent Hazard</option>

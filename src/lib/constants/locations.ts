@@ -685,3 +685,104 @@ export function getConstituenciesByState(stateId: string) {
 
 // Backward compatibility alias
 export const TAMIL_NADU_DISTRICTS = INDIAN_STATES_AND_UTS.find(s => s.id === 'tamil-nadu')?.districts || [];
+
+// Comprehensive Lat/Long Coordinates for Indian States & Major Districts for GIS Heatmap Mapping
+const STATE_COORDINATES: Record<string, { lat: number; lng: number }> = {
+  'tamil nadu': { lat: 11.1271, lng: 78.6569 },
+  'delhi': { lat: 28.7041, lng: 77.1025 },
+  'delhi (nct)': { lat: 28.7041, lng: 77.1025 },
+  'maharashtra': { lat: 19.7515, lng: 75.7139 },
+  'karnataka': { lat: 15.3173, lng: 75.7139 },
+  'kerala': { lat: 10.8505, lng: 76.2711 },
+  'andhra pradesh': { lat: 15.9129, lng: 79.7400 },
+  'telangana': { lat: 18.1124, lng: 79.0193 },
+  'uttar pradesh': { lat: 26.8467, lng: 80.9462 },
+  'west bengal': { lat: 22.9868, lng: 87.8550 },
+  'gujarat': { lat: 22.2587, lng: 71.1924 },
+  'rajasthan': { lat: 27.0238, lng: 74.2179 },
+  'madhya pradesh': { lat: 22.9734, lng: 78.6569 },
+  'bihar': { lat: 25.0961, lng: 85.3131 },
+  'punjab': { lat: 31.1471, lng: 75.3412 },
+  'haryana': { lat: 29.0588, lng: 76.0856 },
+  'odisha': { lat: 20.9517, lng: 85.0985 },
+  'assam': { lat: 26.2006, lng: 92.9376 },
+  'jharkhand': { lat: 23.6102, lng: 85.2799 },
+  'chhattisgarh': { lat: 21.2787, lng: 81.8661 },
+  'uttarakhand': { lat: 30.0668, lng: 79.0193 },
+  'himachal pradesh': { lat: 31.1048, lng: 77.1734 },
+  'jammu and kashmir': { lat: 33.7782, lng: 76.5762 },
+  'goa': { lat: 15.2993, lng: 74.1240 },
+  'puducherry': { lat: 11.9416, lng: 79.8083 },
+  'chandigarh': { lat: 30.7333, lng: 76.7794 },
+};
+
+const DISTRICT_COORDINATES: Record<string, { lat: number; lng: number }> = {
+  'chennai': { lat: 13.0827, lng: 80.2707 },
+  'coimbatore': { lat: 11.0168, lng: 76.9558 },
+  'madurai': { lat: 9.9252, lng: 78.1198 },
+  'tiruchirappalli': { lat: 10.7905, lng: 78.7047 },
+  'salem': { lat: 11.6643, lng: 78.1460 },
+  'tirunelveli': { lat: 8.7139, lng: 77.7567 },
+  'kanchipuram': { lat: 12.8342, lng: 79.7036 },
+  'thiruvallur': { lat: 13.1432, lng: 79.9079 },
+  'vellore': { lat: 12.9165, lng: 79.1325 },
+  'erode': { lat: 11.3410, lng: 77.7172 },
+  'tiruppur': { lat: 11.1085, lng: 77.3411 },
+  'thanjavur': { lat: 10.7870, lng: 79.1378 },
+  'dindigul': { lat: 10.3673, lng: 77.9803 },
+  'cuddalore': { lat: 11.7480, lng: 79.7714 },
+  'new delhi': { lat: 28.6139, lng: 77.2090 },
+  'central delhi': { lat: 28.6448, lng: 77.2167 },
+  'south delhi': { lat: 28.4817, lng: 77.1873 },
+  'mumbai city': { lat: 18.9388, lng: 72.8354 },
+  'mumbai suburban': { lat: 19.0760, lng: 72.8777 },
+  'pune': { lat: 18.5204, lng: 73.8567 },
+  'nagpur': { lat: 21.1458, lng: 79.0882 },
+  'bengaluru urban': { lat: 12.9716, lng: 77.5946 },
+  'bengaluru': { lat: 12.9716, lng: 77.5946 },
+  'mysuru': { lat: 12.2958, lng: 76.6394 },
+  'hyderabad': { lat: 17.3850, lng: 78.4867 },
+  'visakhapatnam': { lat: 17.6868, lng: 83.2185 },
+  'thiruvananthapuram': { lat: 8.5241, lng: 76.9366 },
+  'ernakulam': { lat: 9.9816, lng: 76.2999 },
+  'varanasi': { lat: 25.3176, lng: 82.9739 },
+  'lucknow': { lat: 26.8467, lng: 80.9462 },
+  'kanpur': { lat: 26.4499, lng: 80.3319 },
+  'patna': { lat: 25.5941, lng: 85.1376 },
+  'kolkata': { lat: 22.5726, lng: 88.3639 },
+  'ahmedabad': { lat: 23.0225, lng: 72.5714 },
+  'surat': { lat: 21.1702, lng: 72.8311 },
+  'jaipur': { lat: 26.9124, lng: 75.7873 },
+  'bhopal': { lat: 23.2599, lng: 77.4126 },
+  'indore': { lat: 22.7196, lng: 75.8577 },
+};
+
+export function getLocationCoordinates(state?: string, district?: string): { lat: number; lng: number } {
+  if (district) {
+    const dKey = district.trim().toLowerCase();
+    if (DISTRICT_COORDINATES[dKey]) {
+      // Add slight micro-offset for unique visual scatter on map
+      const offsetLat = (Math.random() - 0.5) * 0.02;
+      const offsetLng = (Math.random() - 0.5) * 0.02;
+      return {
+        lat: Number((DISTRICT_COORDINATES[dKey].lat + offsetLat).toFixed(4)),
+        lng: Number((DISTRICT_COORDINATES[dKey].lng + offsetLng).toFixed(4)),
+      };
+    }
+  }
+
+  if (state) {
+    const sKey = state.trim().toLowerCase();
+    if (STATE_COORDINATES[sKey]) {
+      const offsetLat = (Math.random() - 0.5) * 0.05;
+      const offsetLng = (Math.random() - 0.5) * 0.05;
+      return {
+        lat: Number((STATE_COORDINATES[sKey].lat + offsetLat).toFixed(4)),
+        lng: Number((STATE_COORDINATES[sKey].lng + offsetLng).toFixed(4)),
+      };
+    }
+  }
+
+  // National centroid default: New Delhi / Central India
+  return { lat: 28.6139, lng: 77.2090 };
+}

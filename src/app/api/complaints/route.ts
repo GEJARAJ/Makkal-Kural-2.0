@@ -3,6 +3,8 @@ import { fullComplaintSubmissionSchema } from '@/lib/validation';
 import { generateReferenceNumber, maskEmail, maskPhone } from '@/lib/utils';
 import { routeComplaintToRepresentative } from '@/lib/routing-engine';
 import { dispatchComplaintToRepresentative, MultiChannelResult } from '@/lib/delivery-service';
+import { sendCitizenComplaintCopy } from '@/lib/email-service';
+import { getLocationCoordinates } from '@/lib/constants/locations';
 import { createComplaint, getComplaints, createComplaintAttachment, createDeliveryLog, createComplaintUpdate, uploadAttachment } from '@/lib/supabase/database';
 import { Complaint, DeliveryLog, DeliveryChannel, DeliveryStatus, ComplaintUpdate, ComplaintStatus } from '@/types/database';
 import { withRateLimit, applySecurityHeaders } from '@/lib/rate-limit';
@@ -105,6 +107,10 @@ export async function POST(req: NextRequest) {
       },
     ];
 
+    const geo = (data.latitude && data.longitude) 
+      ? { lat: data.latitude, lng: data.longitude }
+      : getLocationCoordinates(data.state, data.district);
+
     const initialDeliveryLogs: DeliveryLog[] = [];
     let finalStatus: ComplaintStatus = 'SUBMITTED';
 
@@ -126,8 +132,8 @@ export async function POST(req: NextRequest) {
       constituency: data.constituency,
       parliamentary_constituency: data.parliamentaryConstituency || data.constituency,
       locality: data.locality,
-      latitude: data.latitude,
-      longitude: data.longitude,
+      latitude: geo.lat,
+      longitude: geo.lng,
       severity: data.severity,
       status: finalStatus,
       assigned_representative_id: assignedRep?.id,
@@ -169,18 +175,53 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // AUTOMATED COMPLAINT PETITION COPY TO CITIZEN EMAIL
     if (data.submitterEmail) {
       Promise.resolve().then(async () => {
         try {
-          await sendComplaintConfirmationEmail(
-            data.submitterEmail,
-            refNumber,
-            data.title,
-            data.district,
-            'SUBMITTED'
-          );
+          const citizenComplaintObj: Complaint = {
+            id: finalComplaintId,
+            reference_number: refNumber,
+            category: data.category,
+            subcategory: data.subcategory,
+            ministry: routing.matchedMinistry || data.ministry,
+            title: data.title,
+            description: data.description,
+            original_language: data.originalLanguage,
+            ai_improved_title: data.aiImprovedTitle,
+            ai_improved_description: data.aiImprovedDescription,
+            translated_description: data.translatedDescription,
+            state: data.state,
+            district: data.district,
+            city: data.city,
+            constituency: data.constituency,
+            locality: data.locality,
+            latitude: geo.lat,
+            longitude: geo.lng,
+            severity: data.severity,
+            status: finalStatus,
+            is_anonymous: data.isAnonymous,
+            submitter_name: data.submitterName,
+            submitter_email: data.submitterEmail,
+            submitter_phone: data.submitterPhone,
+            created_at: now,
+            updated_at: now,
+          };
+
+          const citizenEmailResult = await sendCitizenComplaintCopy(citizenComplaintObj);
+          
+          await createDeliveryLog({
+            id: crypto.randomUUID(),
+            complaint_id: finalComplaintId,
+            channel: 'EMAIL' as DeliveryChannel,
+            recipient: data.submitterEmail,
+            status: (citizenEmailResult.success ? 'SUCCESS' : 'FAILED') as DeliveryStatus,
+            external_message_id: citizenEmailResult.messageId,
+            error_message: citizenEmailResult.error,
+            sent_at: new Date().toISOString(),
+          });
         } catch (err) {
-          console.error('Confirmation email failed', err);
+          console.error('Citizen confirmation copy dispatch failed', err);
         }
       });
 
