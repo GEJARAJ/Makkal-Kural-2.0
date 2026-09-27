@@ -12,11 +12,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
 
     const variants = {
-      primary: 'bg-navy-950 text-white hover:bg-navy-900 focus:ring-navy-700 shadow-sm',
+      primary: 'bg-navy-950 dark:bg-emerald-600 text-white hover:bg-navy-900 dark:hover:bg-emerald-700 focus:ring-navy-700 shadow-sm',
       civic: 'bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500 shadow-sm shadow-emerald-700/20',
-      secondary: 'bg-navy-100 text-navy-900 hover:bg-navy-200 focus:ring-navy-400',
-      outline: 'border border-navy-300 bg-transparent text-navy-800 hover:bg-navy-50 focus:ring-navy-400',
-      ghost: 'bg-transparent text-navy-700 hover:bg-navy-100 focus:ring-navy-300',
+      secondary: 'bg-navy-100 dark:bg-navy-800 text-navy-900 dark:text-white hover:bg-navy-200 dark:hover:bg-navy-700 focus:ring-navy-400',
+      outline: 'border border-navy-300 dark:border-navy-700 bg-transparent text-navy-800 dark:text-navy-200 hover:bg-navy-50 dark:hover:bg-navy-800/80 focus:ring-navy-400',
+      ghost: 'bg-transparent text-navy-700 dark:text-navy-300 hover:bg-navy-100 dark:hover:bg-navy-800 focus:ring-navy-300',
       danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm',
     };
 

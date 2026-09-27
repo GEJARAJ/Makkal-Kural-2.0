@@ -5,7 +5,7 @@ export function Card({ className, children, ...props }: React.HTMLAttributes<HTM
   return (
     <div
       className={cn(
-        'bg-white rounded-xl border border-navy-200/80 shadow-sm shadow-navy-950/5 overflow-hidden transition-all duration-200',
+        'bg-white dark:bg-navy-900 rounded-xl border border-navy-200/80 dark:border-navy-800 shadow-sm shadow-navy-950/5 overflow-hidden transition-all duration-200 text-navy-950 dark:text-white',
         className
       )}
       {...props}
@@ -17,7 +17,7 @@ export function Card({ className, children, ...props }: React.HTMLAttributes<HTM
 
 export function CardHeader({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('px-6 py-5 border-b border-navy-100', className)} {...props}>
+    <div className={cn('px-6 py-5 border-b border-navy-100 dark:border-navy-800', className)} {...props}>
       {children}
     </div>
   );
@@ -25,7 +25,7 @@ export function CardHeader({ className, children, ...props }: React.HTMLAttribut
 
 export function CardTitle({ className, children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h3 className={cn('text-lg font-semibold text-navy-950', className)} {...props}>
+    <h3 className={cn('text-lg font-semibold text-navy-950 dark:text-white', className)} {...props}>
       {children}
     </h3>
   );
@@ -33,7 +33,7 @@ export function CardTitle({ className, children, ...props }: React.HTMLAttribute
 
 export function CardDescription({ className, children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn('text-sm text-navy-600 mt-1', className)} {...props}>
+    <p className={cn('text-sm text-navy-600 dark:text-navy-400 mt-1', className)} {...props}>
       {children}
     </p>
   );
@@ -49,7 +49,7 @@ export function CardContent({ className, children, ...props }: React.HTMLAttribu
 
 export function CardFooter({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('px-6 py-4 bg-navy-50/60 border-t border-navy-100 flex items-center justify-between', className)} {...props}>
+    <div className={cn('px-6 py-4 bg-navy-50/60 dark:bg-navy-950/60 border-t border-navy-100 dark:border-navy-800 flex items-center justify-between', className)} {...props}>
       {children}
     </div>
   );

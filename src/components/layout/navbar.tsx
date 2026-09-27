@@ -64,7 +64,7 @@ export function Navbar() {
                 <span className="font-bold text-lg text-navy-950 dark:text-white tracking-tight">
                   {t.brand.name}
                 </span>
-                <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 font-mono font-bold tracking-wider border border-emerald-300 dark:border-emerald-800">
+                <span className="hidden sm:inline-block text-[10px] uppercase px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 font-mono font-bold tracking-wider border border-emerald-300 dark:border-emerald-800">
                   GOI &bull; CENTRAL
                 </span>
               </div>
@@ -180,8 +180,8 @@ export function Navbar() {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium',
-                  isActive ? 'bg-navy-100 dark:bg-navy-800 text-navy-950 dark:text-white font-bold' : 'text-navy-700 dark:text-navy-300 hover:bg-navy-50'
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                  isActive ? 'bg-navy-100 dark:bg-navy-800 text-navy-950 dark:text-white font-bold' : 'text-navy-700 dark:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900'
                 )}
               >
                 {Icon && <Icon className="w-4 h-4 text-emerald-600" />}
