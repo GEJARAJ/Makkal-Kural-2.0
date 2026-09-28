@@ -75,7 +75,7 @@ export function buildXShareUrl(
   representative?: Representative
 ): string {
   const fullText = buildXDraftPetition(complaint, representative);
-  return `https://x.com/intent/post?text=${encodeURIComponent(fullText)}`;
+  return `https://twitter.com/intent/tweet?text=${encodeURIComponent(fullText)}`;
 }
 
 export function buildXOfficialReplyUrl(
@@ -87,8 +87,8 @@ export function buildXOfficialReplyUrl(
 
 /**
  * Automates redirecting to X (Twitter):
- * On mobile, attempts deep linking to X/Twitter app, fallback to web intent.
- * On desktop, opens web compose intent directly.
+ * Opens universal compose intent directly with pop-up blocker fallback.
+ * Works seamlessly on both Desktop & Mobile (iOS / Android X App).
  */
 export function openXIntentOrApp(
   complaint: Complaint,
@@ -98,24 +98,14 @@ export function openXIntentOrApp(
 
   const fullText = buildXDraftPetition(complaint, representative);
   const encodedText = encodeURIComponent(fullText);
-  const webIntentUrl = `https://x.com/intent/post?text=${encodedText}`;
+  const tweetUrl = `https://twitter.com/intent/tweet?text=${encodedText}`;
 
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  if (isMobile) {
-    const nativeAppUrl = `twitter://post?message=${encodedText}`;
-    
-    // Attempt native app, fallback to web
-    const start = Date.now();
-    window.location.href = nativeAppUrl;
-
-    setTimeout(() => {
-      // If user is still on page after 600ms, redirect to web intent
-      if (Date.now() - start < 1500) {
-        window.open(webIntentUrl, '_blank');
-      }
-    }, 600);
-  } else {
-    window.open(webIntentUrl, '_blank');
+  try {
+    const newWin = window.open(tweetUrl, '_blank', 'noopener,noreferrer');
+    if (!newWin || newWin.closed || typeof newWin.closed === 'undefined') {
+      window.location.href = tweetUrl;
+    }
+  } catch {
+    window.location.href = tweetUrl;
   }
 }

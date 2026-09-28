@@ -8,9 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { buildXShareUrl, buildXOfficialReplyUrl, openXIntentOrApp } from '@/lib/x-share-service';
-import dynamic from 'next/dynamic';
-import { formatDate } from '@/lib/utils';
-const ComplaintMap = dynamic(
+import nextDynamic from 'next/dynamic';
+import { formatDate, cn } from '@/lib/utils';
+const ComplaintMap = nextDynamic(
   () => import('@/components/maps/complaint-map').then((mod) => mod.ComplaintMap),
   {
     ssr: false,
@@ -49,7 +49,7 @@ import {
   ShieldAlert,
   ArrowRight
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+export const dynamic = 'force-dynamic';
 
 export default function TrackDetailPage({
   params,
@@ -394,25 +394,45 @@ export default function TrackDetailPage({
               : isTamil ? `நானும் பாதிக்கப்பட்டுள்ளேன் (${upvotes})` : `I Am Also Affected (${upvotes})`}
           </Button>
 
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => openXIntentOrApp(complaint, complaint.assigned_representative)}
-            className="text-xs bg-navy-800 text-white hover:bg-navy-700 border border-navy-700"
+          <a
+            href={xShareUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => {
+              e.preventDefault();
+              openXIntentOrApp(complaint, complaint.assigned_representative);
+            }}
+            className="inline-flex"
           >
-            <Share2 className="w-3.5 h-3.5 mr-1 text-sky-400" />
-            {isTamil ? 'X (Twitter)-ல் பகிர்க' : 'Post to X'}
-          </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="text-xs bg-navy-800 hover:bg-sky-600 text-white border border-navy-700 hover:border-sky-500 transition-all"
+            >
+              <Share2 className="w-3.5 h-3.5 mr-1.5 text-sky-400" />
+              {isTamil ? 'X (Twitter)-ல் பதிவிடுக' : 'Post to X'}
+            </Button>
+          </a>
 
           {complaint.assigned_representative?.x_handle && (
-            <Button
-              size="sm"
-              onClick={() => openXIntentOrApp(complaint, complaint.assigned_representative)}
-              className="text-xs bg-emerald-600 text-white hover:bg-emerald-700"
+            <a
+              href={xReplyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.preventDefault();
+                openXIntentOrApp(complaint, complaint.assigned_representative);
+              }}
+              className="inline-flex"
             >
-              <Send className="w-3.5 h-3.5 mr-1" />
-              {isTamil ? 'அதிகாரியை குறிப்பிடுக' : 'Tag Official'}
-            </Button>
+              <Button
+                size="sm"
+                className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-xs"
+              >
+                <Send className="w-3.5 h-3.5 mr-1.5" />
+                {isTamil ? 'அதிகாரியை குறிப்பிடுக' : 'Tag Official'}
+              </Button>
+            </a>
           )}
         </div>
       </div>
@@ -562,28 +582,44 @@ export default function TrackDetailPage({
           )}
 
           {/* Dossier Card */}
-          <Card className="border-navy-200 shadow-sm">
-            <CardHeader>
+          <Card className="border-navy-200 dark:border-navy-800 bg-white dark:bg-navy-900 shadow-sm">
+            <CardHeader className="border-b border-navy-100 dark:border-navy-800 pb-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-navy-500">
+                <span className="text-xs font-semibold uppercase tracking-wider text-navy-500 dark:text-navy-400">
                   {complaint.category.toUpperCase()} &rsaquo; {complaint.subcategory}
                 </span>
                 <Badge severity={complaint.severity}>
                   {complaint.severity}
                 </Badge>
               </div>
-              <CardTitle className="text-lg mt-2">
+              <CardTitle className="text-lg mt-2 text-navy-950 dark:text-white">
                 {complaint.ai_improved_title || complaint.title}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 text-xs">
-              <div>
-                <span className="font-semibold uppercase tracking-wider text-navy-500 block mb-1">
-                  {isTamil ? 'புகார் விபரம்' : 'Grievance Description'}
-                </span>
-                <div className="p-4 rounded-xl bg-navy-50/70 text-navy-900 leading-relaxed whitespace-pre-wrap border border-navy-200">
-                  {complaint.ai_improved_description || complaint.description}
+            <CardContent className="space-y-4 text-xs pt-4">
+              {/* Problem Statement Section */}
+              <div className="space-y-3">
+                <div>
+                  <span className="font-bold uppercase tracking-wider text-navy-700 dark:text-navy-300 block mb-1.5 flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    {isTamil ? 'குடிமக்கள் புகார் அறிக்கை (Citizen Problem Statement)' : 'Citizen Problem Statement'}
+                  </span>
+                  <div className="p-4 rounded-xl bg-navy-50/80 dark:bg-navy-950/80 text-navy-900 dark:text-navy-100 leading-relaxed whitespace-pre-wrap border border-navy-200/80 dark:border-navy-800">
+                    {complaint.description}
+                  </div>
                 </div>
+
+                {complaint.ai_improved_description && complaint.ai_improved_description !== complaint.description && (
+                  <div>
+                    <span className="font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 block mb-1.5 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      {isTamil ? 'அரசு துறைக்கான AI சட்டபூர்வ மனு வடிவம்' : 'AI-Structured Official Government Petition'}
+                    </span>
+                    <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 text-emerald-950 dark:text-emerald-100 leading-relaxed whitespace-pre-wrap border border-emerald-200/80 dark:border-emerald-800">
+                      {complaint.ai_improved_description}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">

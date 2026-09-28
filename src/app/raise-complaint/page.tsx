@@ -31,7 +31,7 @@ import { StepPreview } from '@/components/wizard/step-preview';
     AlertCircle,
     MapPin
   } from 'lucide-react';
-import { cn } from '@/lib/utils';
+export const dynamic = 'force-dynamic';
 
 export default function RaiseComplaintPage() {
   const { t, isTamil, language } = useLanguage();
