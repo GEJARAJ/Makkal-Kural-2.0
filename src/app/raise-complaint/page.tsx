@@ -430,14 +430,15 @@ export default function RaiseComplaintPage() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2 pt-1">
-                    <Button
-                      type="button"
-                      onClick={() => openXIntentOrApp(complaintData, submitSuccess.assignedRep)}
-                      className="flex-1 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-sm"
+                    <a
+                      href={xShareUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-lg bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-sm transition-all"
                     >
-                      <Share2 className="w-3.5 h-3.5 mr-1.5" />
-                      {isTamil ? 'X-ல் உடனே பதிவிடுக (App / Web)' : 'Broadcast to X Now (App / Web)'}
-                    </Button>
+                      <Share2 className="w-3.5 h-3.5" />
+                      <span>{isTamil ? 'X-ல் உடனே பதிவிடுக (App / Web)' : 'Broadcast to X Now (App / Web)'}</span>
+                    </a>
                     <Button
                       type="button"
                       variant="outline"

@@ -398,20 +398,10 @@ export default function TrackDetailPage({
             href={xShareUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={(e) => {
-              e.preventDefault();
-              openXIntentOrApp(complaint, complaint.assigned_representative);
-            }}
-            className="inline-flex"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-navy-800 hover:bg-sky-600 text-white border border-navy-700 hover:border-sky-500 transition-all shadow-xs"
           >
-            <Button
-              variant="secondary"
-              size="sm"
-              className="text-xs bg-navy-800 hover:bg-sky-600 text-white border border-navy-700 hover:border-sky-500 transition-all"
-            >
-              <Share2 className="w-3.5 h-3.5 mr-1.5 text-sky-400" />
-              {isTamil ? 'X (Twitter)-ல் பதிவிடுக' : 'Post to X'}
-            </Button>
+            <Share2 className="w-3.5 h-3.5 text-sky-400" />
+            <span>{isTamil ? 'X (Twitter)-ல் பதிவிடுக' : 'Post to X'}</span>
           </a>
 
           {complaint.assigned_representative?.x_handle && (
@@ -419,19 +409,10 @@ export default function TrackDetailPage({
               href={xReplyUrl}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => {
-                e.preventDefault();
-                openXIntentOrApp(complaint, complaint.assigned_representative);
-              }}
-              className="inline-flex"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-xs"
             >
-              <Button
-                size="sm"
-                className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-xs"
-              >
-                <Send className="w-3.5 h-3.5 mr-1.5" />
-                {isTamil ? 'அதிகாரியை குறிப்பிடுக' : 'Tag Official'}
-              </Button>
+              <Send className="w-3.5 h-3.5" />
+              <span>{isTamil ? 'அதிகாரியை குறிப்பிடுக' : 'Tag Official'}</span>
             </a>
           )}
         </div>

@@ -16,24 +16,27 @@ export const MINISTRY_X_HANDLES: Record<string, { ministryHandle: string; minist
 };
 
 export function buildXDraftPetition(
-  complaint: Complaint,
+  complaint: Partial<Complaint> & { reference_number?: string; title?: string; locality?: string; district?: string; state?: string; category?: string; ai_improved_title?: string },
   representative?: Representative
 ): string {
-  const ref = complaint.reference_number;
-  const area = complaint.locality || complaint.city || complaint.district;
-  const state = complaint.state;
-  const categoryId = complaint.category;
-  const ministryInfo = MINISTRY_X_HANDLES[categoryId];
+  const ref = complaint.reference_number || 'MK2-REF';
+  const area = complaint.locality || complaint.city || complaint.district || 'India';
+  const state = complaint.state || '';
+  const categoryId = complaint.category || '';
+  const ministryInfo = categoryId ? MINISTRY_X_HANDLES[categoryId] : null;
 
-  const titleClean = (complaint.ai_improved_title || complaint.title).trim();
-  const shortTitle = titleClean.length > 90 ? titleClean.slice(0, 87) + '...' : titleClean;
+  const titleClean = (complaint.ai_improved_title || complaint.title || 'Civic Issue').trim();
+  const shortTitle = titleClean.length > 80 ? titleClean.slice(0, 77) + '...' : titleClean;
 
   // Handles to tag
   const handles: string[] = [];
 
   if (representative?.x_handle) {
-    const cleanHandle = `@${representative.x_handle.replace('@', '')}`;
-    if (!handles.includes(cleanHandle)) handles.push(cleanHandle);
+    const raw = representative.x_handle.trim().replace(/^@+/, '');
+    if (raw) {
+      const cleanHandle = `@${raw}`;
+      if (!handles.includes(cleanHandle)) handles.push(cleanHandle);
+    }
   }
 
   if (ministryInfo) {
@@ -49,29 +52,30 @@ export function buildXDraftPetition(
     handles.push('@PMOIndia', '@DARPG_GoI');
   }
 
-  const appBaseUrl = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'https://makkalkural.org');
+  const appBaseUrl = typeof window !== 'undefined' && window.location.origin
+    ? window.location.origin
+    : (process.env.NEXT_PUBLIC_APP_URL || 'https://makkal-kural-2-0.vercel.app');
   const trackUrl = `${appBaseUrl}/track/${ref}`;
 
   const textLines = [
     `📢 CITIZEN PETITION #${ref}`,
     ``,
-    `Attention: ${handles.join(' ')}`,
+    `Attn: ${handles.join(' ')}`,
     ``,
-    `Issue: "${shortTitle}"`,
-    `📍 ${area}, ${complaint.district}, ${state}`,
+    `"${shortTitle}"`,
+    `📍 ${area}${state ? `, ${state}` : ''}`,
     ``,
-    `Citizens request prompt verification and redressal under Citizen's Charter.`,
+    `Tracking & Live Audit Dossier:`,
+    `${trackUrl}`,
     ``,
-    `🔗 Live Audit Dossier: ${trackUrl}`,
-    ``,
-    `#MakkalKural #CPGRAMS #PublicGrievance #CitizenVoice #GoI`
+    `#MakkalKural #CPGRAMS #CitizenVoice`
   ];
 
   return textLines.join('\n');
 }
 
 export function buildXShareUrl(
-  complaint: Complaint,
+  complaint: Partial<Complaint> & { reference_number?: string; title?: string; locality?: string; district?: string; state?: string; category?: string; ai_improved_title?: string },
   representative?: Representative
 ): string {
   const fullText = buildXDraftPetition(complaint, representative);
@@ -79,19 +83,18 @@ export function buildXShareUrl(
 }
 
 export function buildXOfficialReplyUrl(
-  complaint: Complaint,
+  complaint: Partial<Complaint> & { reference_number?: string; title?: string; locality?: string; district?: string; state?: string; category?: string; ai_improved_title?: string },
   representative?: Representative
 ): string {
   return buildXShareUrl(complaint, representative);
 }
 
 /**
- * Automates redirecting to X (Twitter):
- * Opens universal compose intent directly with pop-up blocker fallback.
- * Works seamlessly on both Desktop & Mobile (iOS / Android X App).
+ * Automates opening the X / Twitter composer:
+ * Works seamlessly across Desktop and Mobile without popup-blocker issues.
  */
 export function openXIntentOrApp(
-  complaint: Complaint,
+  complaint: Partial<Complaint> & { reference_number?: string; title?: string; locality?: string; district?: string; state?: string; category?: string; ai_improved_title?: string },
   representative?: Representative
 ): void {
   if (typeof window === 'undefined') return;
@@ -100,12 +103,12 @@ export function openXIntentOrApp(
   const encodedText = encodeURIComponent(fullText);
   const tweetUrl = `https://twitter.com/intent/tweet?text=${encodedText}`;
 
-  try {
-    const newWin = window.open(tweetUrl, '_blank', 'noopener,noreferrer');
-    if (!newWin || newWin.closed || typeof newWin.closed === 'undefined') {
-      window.location.href = tweetUrl;
-    }
-  } catch {
-    window.location.href = tweetUrl;
-  }
+  // Create an invisible link element and click it natively to prevent popup blockers
+  const link = document.createElement('a');
+  link.href = tweetUrl;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
