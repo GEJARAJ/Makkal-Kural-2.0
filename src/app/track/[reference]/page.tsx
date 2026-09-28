@@ -74,6 +74,7 @@ export default function TrackDetailPage({
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
+  const [copiedDraft, setCopiedDraft] = useState(false);
 
   useEffect(() => {
     async function fetchComplaint() {
@@ -286,7 +287,6 @@ export default function TrackDetailPage({
   const currentStepIdx = getStepIndex(complaint.status);
   const xShareUrl = buildXShareUrl(complaint, complaint.assigned_representative);
   const xReplyUrl = buildXOfficialReplyUrl(complaint, complaint.assigned_representative);
-  const [copiedDraft, setCopiedDraft] = useState(false);
 
   // SLA calculations
   const slaDeadline = complaint.sla_deadline ? new Date(complaint.sla_deadline) : null;
