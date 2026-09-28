@@ -213,7 +213,13 @@ export default function RaiseComplaintPage() {
         body: formData,
       });
 
-      const json = await res.json();
+      let json: any = {};
+      try {
+        json = await res.json();
+      } catch {
+        json = { error: 'Server returned an invalid response. Please try again.' };
+      }
+
       if (res.ok && json.success) {
         try {
           const newComplaintObj = {
@@ -284,10 +290,11 @@ export default function RaiseComplaintPage() {
           multiChannelResult: json.multiChannelResult,
         });
       } else {
-        setErrors({ submit: json.error || 'Failed to submit complaint' });
+        setErrors({ submit: json.error || 'Failed to submit complaint. Please check your form details.' });
       }
     } catch (err: any) {
-      setErrors({ submit: err.message || 'Network connection failed' });
+      console.error('Complaint submission error', err);
+      setErrors({ submit: err?.message?.includes('fetch') ? 'Network connection interrupted. Please try submitting again.' : (err?.message || 'Network connection failed') });
     } finally {
       setIsSubmitting(false);
     }

@@ -2,31 +2,33 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_MAX = 60; // 60 requests per minute
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function getClientId(req: NextRequest): string {
   const forwarded = req.headers.get('x-forwarded-for');
   if (forwarded) return forwarded.split(',')[0].trim();
-  return 'unknown';
+  const realIp = req.headers.get('x-real-ip');
+  if (realIp) return realIp.trim();
+  return 'client-' + (Math.random().toString(36).substring(2, 8));
 }
 
-function checkRateLimit(key: string): { allowed: boolean; remaining: number; resetAt: number } {
+function checkRateLimit(key: string, maxLimit = RATE_LIMIT_MAX): { allowed: boolean; remaining: number; resetAt: number } {
   const now = Date.now();
   const entry = rateLimitMap.get(key);
 
   if (!entry || now > entry.resetAt) {
     const resetAt = now + RATE_LIMIT_WINDOW_MS;
     rateLimitMap.set(key, { count: 1, resetAt });
-    return { allowed: true, remaining: RATE_LIMIT_MAX - 1, resetAt };
+    return { allowed: true, remaining: maxLimit - 1, resetAt };
   }
 
-  if (entry.count >= RATE_LIMIT_MAX) {
+  if (entry.count >= maxLimit) {
     return { allowed: false, remaining: 0, resetAt: entry.resetAt };
   }
 
   entry.count += 1;
-  return { allowed: true, remaining: RATE_LIMIT_MAX - entry.count, resetAt: entry.resetAt };
+  return { allowed: true, remaining: maxLimit - entry.count, resetAt: entry.resetAt };
 }
 
 export function applySecurityHeaders(response: NextResponse): NextResponse {
@@ -34,7 +36,6 @@ export function applySecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   return response;
 }
 
@@ -44,9 +45,8 @@ export function withSecurityHeaders(response: NextResponse) {
 
 export function withRateLimit(req: NextRequest, options?: { max?: number; windowMs?: number }) {
   const max = options?.max || RATE_LIMIT_MAX;
-  const windowMs = options?.windowMs || RATE_LIMIT_WINDOW_MS;
   const key = getClientId(req);
-  const result = checkRateLimit(key);
+  const result = checkRateLimit(key, max);
 
   const response = NextResponse.next();
   applySecurityHeaders(response);
@@ -56,7 +56,7 @@ export function withRateLimit(req: NextRequest, options?: { max?: number; window
 
   if (!result.allowed) {
     return NextResponse.json(
-      { error: 'Too many requests. Please try again later.' },
+      { error: 'Too many requests. Please wait a moment before trying again.' },
       {
         status: 429,
         headers: {
