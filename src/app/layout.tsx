@@ -11,6 +11,7 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
+  fallback: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
 });
 
 const notoSansTamil = Noto_Sans_Tamil({
@@ -18,6 +19,7 @@ const notoSansTamil = Noto_Sans_Tamil({
   variable: '--font-noto-tamil',
   weight: ['400', '500', '600', '700'],
   display: 'swap',
+  fallback: ['Latha', 'Mukta Malar', 'sans-serif'],
 });
 
 const notoSansDevanagari = Noto_Sans_Devanagari({
@@ -25,6 +27,7 @@ const notoSansDevanagari = Noto_Sans_Devanagari({
   variable: '--font-noto-devanagari',
   weight: ['400', '500', '600', '700'],
   display: 'swap',
+  fallback: ['Mangal', 'Nirmala UI', 'sans-serif'],
 });
 
 export const metadata: Metadata = {
