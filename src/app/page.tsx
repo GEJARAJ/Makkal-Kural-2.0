@@ -30,7 +30,12 @@ import {
   Wheat, 
   HelpCircle,
   Database,
-  Landmark
+  Landmark,
+  Bus,
+  AlertTriangle,
+  TrendingUp,
+  ShieldAlert,
+  Cpu
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ElementType> = {
@@ -207,6 +212,95 @@ export default function LandingPage() {
             <div className="text-3xl sm:text-4xl font-extrabold text-emerald-700 dark:text-emerald-400 font-mono">94.2%</div>
             <div className="text-xs font-semibold text-navy-600 dark:text-navy-400">{t.stats.resolutionRate}</div>
           </Card>
+        </div>
+      </section>
+
+      {/* 2.5 URBAN SENSE AI MOBILITY & ROAD INTELLIGENCE SUITE */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-r from-navy-950 via-navy-900 to-emerald-950 text-white border border-navy-800 shadow-2xl relative overflow-hidden space-y-8">
+          
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold border border-emerald-500/30">
+                <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                NEW &bull; AI URBAN MOBILITY & ROAD INTELLIGENCE PLATFORM
+              </div>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
+                Makkal Kural <span className="text-emerald-400">UrbanSense</span> Suite
+              </h2>
+              <p className="text-xs sm:text-sm text-navy-300 leading-relaxed">
+                Transforming public transit buses into mobile edge AI sensing units. Autonomous road defect detection, real-time vehicular classification, Origin-Destination flow sensing, and 1-click grievance escalation.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Link href="/urban-command">
+                <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-5 shadow-lg shadow-emerald-600/30">
+                  <Radio className="w-4 h-4 mr-2 text-white animate-pulse" />
+                  Launch Command Center
+                </Button>
+              </Link>
+              <Link href="/fleet">
+                <Button variant="outline" size="lg" className="text-xs font-semibold border-white/20 text-white hover:bg-white/10">
+                  <Bus className="w-4 h-4 mr-2 text-cyan-400" />
+                  Live Bus Fleet Map
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* 4 Feature Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <Link href="/road-intelligence" className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-400/50 hover:bg-white/10 transition-all space-y-2 group">
+              <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-300 w-fit group-hover:bg-amber-500 group-hover:text-navy-950 transition-colors">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">
+                AI Road Defect Detection
+              </h3>
+              <p className="text-[11px] text-navy-300">
+                Potholes, surface cracks & missing dividers verified across multiple buses with 1-click grievance escalation.
+              </p>
+            </Link>
+
+            <Link href="/traffic-intelligence" className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 transition-all space-y-2 group">
+              <div className="p-2.5 rounded-xl bg-cyan-500/20 text-cyan-300 w-fit group-hover:bg-cyan-500 group-hover:text-navy-950 transition-colors">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
+                Traffic & OD Flow AI
+              </h3>
+              <p className="text-[11px] text-navy-300">
+                6-class vehicular classification, corridor density index, and origin-destination travel delay matrix.
+              </p>
+            </Link>
+
+            <Link href="/incidents" className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-rose-400/50 hover:bg-white/10 transition-all space-y-2 group">
+              <div className="p-2.5 rounded-xl bg-rose-500/20 text-rose-300 w-fit group-hover:bg-rose-500 group-hover:text-navy-950 transition-colors">
+                <ShieldAlert className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-bold text-white group-hover:text-rose-300 transition-colors">
+                Incidents & ANPR Plate OCR
+              </h3>
+              <p className="text-[11px] text-navy-300">
+                5-stage visual vehicle tracking pipeline, dangerous driving alerts, and searchable license plate database.
+              </p>
+            </Link>
+
+            <Link href="/edge-ai" className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-purple-400/50 hover:bg-white/10 transition-all space-y-2 group">
+              <div className="p-2.5 rounded-xl bg-purple-500/20 text-purple-300 w-fit group-hover:bg-purple-500 group-hover:text-navy-950 transition-colors">
+                <Cpu className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors">
+                On-Bus Edge AI Architecture
+              </h3>
+              <p className="text-[11px] text-navy-300">
+                30 FPS on-device inference saving 98.6% cellular bandwidth by uploading only 5s event snippets.
+              </p>
+            </Link>
+
+          </div>
         </div>
       </section>
 

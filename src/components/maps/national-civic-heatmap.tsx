@@ -20,9 +20,15 @@ import {
   Flame, 
   ShieldAlert,
   Search,
-  RotateCcw
+  RotateCcw,
+  Bus,
+  AlertTriangle,
+  Droplets,
+  TrendingUp,
+  Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BusFleetItem, RoadDefectItem, TrafficIntelligenceData } from '@/types/urban-intelligence';
 
 // Leaflet icon setup
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -44,11 +50,38 @@ export function NationalCivicHeatmap({ complaints, height = '700px' }: HeatmapPr
   const [selectedSeverity, setSelectedSeverity] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Multi-source layers
+  const [layerCitizen, setLayerCitizen] = useState(true);
+  const [layerDefects, setLayerDefects] = useState(true);
+  const [layerBuses, setLayerBuses] = useState(true);
+  const [layerTraffic, setLayerTraffic] = useState(true);
+
+  const [fleet, setFleet] = useState<BusFleetItem[]>([]);
+  const [defects, setDefects] = useState<RoadDefectItem[]>([]);
+  const [trafficCorridors, setTrafficCorridors] = useState<TrafficIntelligenceData[]>([]);
+
   useEffect(() => {
     setMounted(true);
+    // Fetch urban intelligence overlays
+    async function loadUrbanLayers() {
+      try {
+        const [fleetRes, defectsRes, trafficRes] = await Promise.all([
+          fetch('/api/urban/fleet').then((r) => r.json()).catch(() => ({})),
+          fetch('/api/urban/defects').then((r) => r.json()).catch(() => ({})),
+          fetch('/api/urban/traffic').then((r) => r.json()).catch(() => ({})),
+        ]);
+        if (fleetRes?.success && fleetRes.data) setFleet(fleetRes.data);
+        if (defectsRes?.success && defectsRes.data) setDefects(defectsRes.data);
+        if (trafficRes?.success && trafficRes.corridors) setTrafficCorridors(trafficRes.corridors);
+      } catch (e) {
+        console.error('Failed to load urban layer data', e);
+      }
+    }
+    loadUrbanLayers();
   }, []);
 
   const filteredComplaints = useMemo(() => {
+    if (!layerCitizen) return [];
     return complaints.map((c) => {
       if (!c.latitude || !c.longitude) {
         const coords = getLocationCoordinates(c.state, c.district);
@@ -72,7 +105,7 @@ export function NationalCivicHeatmap({ complaints, height = '700px' }: HeatmapPr
 
       return true;
     });
-  }, [complaints, selectedCategory, selectedSeverity, searchQuery]);
+  }, [complaints, selectedCategory, selectedSeverity, searchQuery, layerCitizen]);
 
   const getMarkerColor = (severity: SeverityLevel) => {
     switch (severity) {
@@ -95,82 +128,151 @@ export function NationalCivicHeatmap({ complaints, height = '700px' }: HeatmapPr
       >
         <div className="flex flex-col items-center gap-2">
           <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-semibold">Loading National Civic Heatmap...</span>
+          <span className="text-xs font-semibold">Loading National Multi-Source GIS Heatmap...</span>
         </div>
       </div>
     );
   }
 
-  // India centroid: 22.5937° N, 78.9629° E
+  // India centroid
   const indiaCenter: [number, number] = [21.8, 79.5];
 
   return (
     <div className="space-y-4">
-      {/* Filters Bar */}
-      <div className="p-4 rounded-xl bg-white dark:bg-navy-900 border border-navy-200 dark:border-navy-800 shadow-sm flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Search */}
-          <div className="relative">
-            <Search className="w-4 h-4 text-navy-400 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              placeholder={isTamil ? 'மாவட்டம், மாநிலம், எண்...' : 'Search city, state, ref...'}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-3 py-1.5 text-xs rounded-lg border border-navy-200 dark:border-navy-700 bg-navy-50/50 dark:bg-navy-950 text-navy-900 dark:text-white focus:outline-emerald-600 w-44 sm:w-56"
-            />
+      
+      {/* Top Layer Toggles & Filters */}
+      <div className="p-4 rounded-xl bg-white dark:bg-navy-900 border border-navy-200 dark:border-navy-800 shadow-sm space-y-3">
+        
+        {/* Multi-source Layer Controls */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-navy-100 dark:border-navy-800">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-navy-950 dark:text-white">
+            <Layers className="w-4 h-4 text-emerald-600" />
+            <span>GIS Map Layers:</span>
           </div>
 
-          {/* Ministry / Category */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-1.5 text-xs rounded-lg border border-navy-200 dark:border-navy-700 bg-navy-50/50 dark:bg-navy-950 text-navy-900 dark:text-white focus:outline-emerald-600"
-          >
-            <option value="all">{isTamil ? 'அனைத்து துறைகள்' : 'All Union Portfolios'}</option>
-            {CENTRAL_CATEGORIES.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.nameEn}
-              </option>
-            ))}
-          </select>
-
-          {/* Severity */}
-          <select
-            value={selectedSeverity}
-            onChange={(e) => setSelectedSeverity(e.target.value)}
-            className="px-3 py-1.5 text-xs rounded-lg border border-navy-200 dark:border-navy-700 bg-navy-50/50 dark:bg-navy-950 text-navy-900 dark:text-white focus:outline-emerald-600"
-          >
-            <option value="all">{isTamil ? 'அனைத்து அவசர நிலைகள்' : 'All Severities'}</option>
-            <option value="URGENT">🔴 Urgent Hazard</option>
-            <option value="HIGH">🟠 High Priority</option>
-            <option value="MEDIUM">🔵 Medium Priority</option>
-            <option value="LOW">🟢 Low Priority</option>
-          </select>
-
-          {(selectedCategory !== 'all' || selectedSeverity !== 'all' || searchQuery) && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setSelectedCategory('all');
-                setSelectedSeverity('all');
-                setSearchQuery('');
-              }}
-              className="text-xs h-8 border-navy-200"
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setLayerCitizen(!layerCitizen)}
+              className={cn(
+                "px-2.5 py-1 text-xs font-medium rounded-lg border transition-all flex items-center gap-1.5",
+                layerCitizen
+                  ? "bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold"
+                  : "bg-navy-50 dark:bg-navy-950 border-navy-200 dark:border-navy-800 text-navy-400"
+              )}
             >
-              <RotateCcw className="w-3 h-3 mr-1" />
-              Reset
-            </Button>
-          )}
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              Citizen Grievances ({complaints.length})
+            </button>
+
+            <button
+              onClick={() => setLayerDefects(!layerDefects)}
+              className={cn(
+                "px-2.5 py-1 text-xs font-medium rounded-lg border transition-all flex items-center gap-1.5",
+                layerDefects
+                  ? "bg-amber-50 dark:bg-amber-950/60 border-amber-500 text-amber-800 dark:text-amber-300 font-bold"
+                  : "bg-navy-50 dark:bg-navy-950 border-navy-200 dark:border-navy-800 text-navy-400"
+              )}
+            >
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+              AI Road Hazards ({defects.length})
+            </button>
+
+            <button
+              onClick={() => setLayerBuses(!layerBuses)}
+              className={cn(
+                "px-2.5 py-1 text-xs font-medium rounded-lg border transition-all flex items-center gap-1.5",
+                layerBuses
+                  ? "bg-cyan-50 dark:bg-cyan-950/60 border-cyan-500 text-cyan-800 dark:text-cyan-300 font-bold"
+                  : "bg-navy-50 dark:bg-navy-950 border-navy-200 dark:border-navy-800 text-navy-400"
+              )}
+            >
+              <Bus className="w-3.5 h-3.5 text-cyan-500" />
+              Sensing Transit Fleet ({fleet.length})
+            </button>
+
+            <button
+              onClick={() => setLayerTraffic(!layerTraffic)}
+              className={cn(
+                "px-2.5 py-1 text-xs font-medium rounded-lg border transition-all flex items-center gap-1.5",
+                layerTraffic
+                  ? "bg-purple-50 dark:bg-purple-950/60 border-purple-500 text-purple-800 dark:text-purple-300 font-bold"
+                  : "bg-navy-50 dark:bg-navy-950 border-navy-200 dark:border-navy-800 text-navy-400"
+              )}
+            >
+              <TrendingUp className="w-3.5 h-3.5 text-purple-500" />
+              Corridor Traffic ({trafficCorridors.length})
+            </button>
+          </div>
         </div>
 
-        {/* Live Counter Badge */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-navy-700">
-            {isTamil ? `காண்பிக்கப்படும் புகார்கள்: ` : `Active Grievance Clusters: `}
-            <strong className="text-emerald-700 font-mono text-sm">{filteredComplaints.length}</strong>
-          </span>
+        {/* Filter Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Search */}
+            <div className="relative">
+              <Search className="w-4 h-4 text-navy-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                placeholder={isTamil ? 'மாவட்டம், மாநிலம், எண்...' : 'Search city, state, ref...'}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 pr-3 py-1.5 text-xs rounded-lg border border-navy-200 dark:border-navy-700 bg-navy-50/50 dark:bg-navy-950 text-navy-900 dark:text-white focus:outline-emerald-600 w-44 sm:w-56"
+              />
+            </div>
+
+            {/* Ministry / Category */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-3 py-1.5 text-xs rounded-lg border border-navy-200 dark:border-navy-700 bg-navy-50/50 dark:bg-navy-950 text-navy-900 dark:text-white focus:outline-emerald-600"
+            >
+              <option value="all">{isTamil ? 'அனைத்து துறைகள்' : 'All Union Portfolios'}</option>
+              {CENTRAL_CATEGORIES.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.nameEn}
+                </option>
+              ))}
+            </select>
+
+            {/* Severity */}
+            <select
+              value={selectedSeverity}
+              onChange={(e) => setSelectedSeverity(e.target.value)}
+              className="px-3 py-1.5 text-xs rounded-lg border border-navy-200 dark:border-navy-700 bg-navy-50/50 dark:bg-navy-950 text-navy-900 dark:text-white focus:outline-emerald-600"
+            >
+              <option value="all">{isTamil ? 'அனைத்து அவசர நிலைகள்' : 'All Severities'}</option>
+              <option value="URGENT">🔴 Urgent Hazard</option>
+              <option value="HIGH">🟠 High Priority</option>
+              <option value="MEDIUM">🔵 Medium Priority</option>
+              <option value="LOW">🟢 Low Priority</option>
+            </select>
+
+            {(selectedCategory !== 'all' || selectedSeverity !== 'all' || searchQuery) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedCategory('all');
+                  setSelectedSeverity('all');
+                  setSearchQuery('');
+                }}
+                className="text-xs h-8 border-navy-200"
+              >
+                <RotateCcw className="w-3 h-3 mr-1" />
+                Reset
+              </Button>
+            )}
+          </div>
+
+          {/* Live Counter Badge */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-navy-700 dark:text-navy-300">
+              {isTamil ? `காண்பிக்கப்படும் புகார்கள்: ` : `Active Visible Hotspots: `}
+              <strong className="text-emerald-700 dark:text-emerald-400 font-mono text-sm">
+                {filteredComplaints.length + (layerDefects ? defects.length : 0) + (layerBuses ? fleet.length : 0)}
+              </strong>
+            </span>
+          </div>
         </div>
       </div>
 
@@ -187,9 +289,10 @@ export function NationalCivicHeatmap({ complaints, height = '700px' }: HeatmapPr
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
+          {/* 1. Citizen Grievances Layer */}
           {filteredComplaints.map((c) => {
             const color = getMarkerColor(c.severity);
-            const radius = c.severity === 'URGENT' ? 14 : c.severity === 'HIGH' ? 12 : 9;
+            const radius = c.severity === 'URGENT' ? 13 : c.severity === 'HIGH' ? 10 : 8;
 
             return (
               <CircleMarker
@@ -243,28 +346,154 @@ export function NationalCivicHeatmap({ complaints, height = '700px' }: HeatmapPr
               </CircleMarker>
             );
           })}
+
+          {/* 2. AI Road Defects Layer */}
+          {layerDefects && defects.map((defect) => (
+            <CircleMarker
+              key={defect.id}
+              center={[defect.lat, defect.lng]}
+              radius={11}
+              pathOptions={{
+                color: '#f59e0b',
+                fillColor: '#f59e0b',
+                fillOpacity: 0.85,
+                weight: 2,
+              }}
+            >
+              <Popup className="custom-civic-popup">
+                <div className="p-1 space-y-1.5 min-w-[220px] max-w-[280px]">
+                  <div className="flex items-center justify-between">
+                    <Badge className="bg-amber-600 text-white text-[10px] font-mono">
+                      AI DEFECT &bull; {defect.defectType}
+                    </Badge>
+                    <span className="text-[10px] font-mono text-navy-600">
+                      {defect.confidence}% Conf
+                    </span>
+                  </div>
+
+                  <h4 className="text-xs font-bold text-navy-950">
+                    {defect.title}
+                  </h4>
+
+                  <p className="text-[11px] text-navy-600">
+                    📍 {defect.locality}, {defect.district}
+                  </p>
+
+                  <div className="pt-1 border-t border-navy-100 flex items-center justify-between text-[11px]">
+                    <span className="text-emerald-700 font-bold">
+                      Bus {defect.busId}
+                    </span>
+                    <Link
+                      href="/road-intelligence"
+                      className="text-emerald-800 font-bold hover:underline flex items-center gap-0.5"
+                    >
+                      <span>Inspect AI Evidence</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+              </Popup>
+            </CircleMarker>
+          ))}
+
+          {/* 3. Active Transit Fleet Layer */}
+          {layerBuses && fleet.map((bus) => (
+            <CircleMarker
+              key={bus.id}
+              center={[bus.lat, bus.lng]}
+              radius={10}
+              pathOptions={{
+                color: '#06b6d4',
+                fillColor: '#0891b2',
+                fillOpacity: 0.9,
+                weight: 2,
+              }}
+            >
+              <Popup className="custom-civic-popup">
+                <div className="p-1 space-y-1.5 min-w-[200px]">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono font-bold text-xs text-navy-950">
+                      {bus.busNumber}
+                    </span>
+                    <Badge className="bg-cyan-600 text-white text-[10px]">
+                      Route {bus.routeCode}
+                    </Badge>
+                  </div>
+
+                  <p className="text-xs text-navy-700 font-medium">
+                    {bus.routeName}
+                  </p>
+
+                  <div className="text-[11px] text-navy-600 font-mono space-y-0.5">
+                    <div>Speed: {bus.speedKmH} km/h</div>
+                    <div>NPU: {bus.edgeAI.fps} FPS &bull; {bus.edgeAI.npuUsagePct}% Load</div>
+                  </div>
+
+                  <div className="pt-1 border-t border-navy-100 flex justify-end">
+                    <Link
+                      href="/fleet"
+                      className="text-xs font-bold text-cyan-700 hover:underline flex items-center gap-0.5"
+                    >
+                      <span>Live 5-Cam Feed</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+              </Popup>
+            </CircleMarker>
+          ))}
+
+          {/* 4. Traffic Corridors Layer */}
+          {layerTraffic && trafficCorridors.map((c) => (
+            <CircleMarker
+              key={c.corridorId}
+              center={[c.lat, c.lng]}
+              radius={14}
+              pathOptions={{
+                color: c.congestionLevel === 'SEVERE_BOTTLENECK' ? '#ef4444' : '#8b5cf6',
+                fillColor: c.congestionLevel === 'SEVERE_BOTTLENECK' ? '#ef4444' : '#8b5cf6',
+                fillOpacity: 0.35,
+                weight: 2,
+                dashArray: '4, 4',
+              }}
+            >
+              <Popup className="custom-civic-popup">
+                <div className="p-1 space-y-1 min-w-[200px]">
+                  <div className="font-bold text-xs text-navy-950">
+                    {c.corridorName}
+                  </div>
+                  <div className="text-xs text-navy-700">
+                    Density: <strong className="font-mono">{c.densityIndex}/100</strong> ({c.congestionLevel})
+                  </div>
+                  <div className="text-[11px] text-navy-600 font-mono">
+                    Flow: {c.flowRateVehiclesPerMin} veh/min &bull; Speed: {c.avgSpeedKmH} km/h
+                  </div>
+                </div>
+              </Popup>
+            </CircleMarker>
+          ))}
         </MapContainer>
 
         {/* Floating Legend */}
-        <div className="absolute bottom-4 right-4 z-20 p-3 rounded-xl bg-white/95 backdrop-blur-md border border-navy-200 shadow-md text-[11px] space-y-1.5">
-          <div className="font-bold text-navy-950 uppercase tracking-wider text-[10px]">
-            Grievance Hotspot Severity
+        <div className="absolute bottom-4 right-4 z-20 p-3 rounded-xl bg-white/95 dark:bg-navy-950/95 backdrop-blur-md border border-navy-200 dark:border-navy-800 shadow-md text-[11px] space-y-1.5">
+          <div className="font-bold text-navy-950 dark:text-white uppercase tracking-wider text-[10px]">
+            GIS Multi-Source Hotspots
           </div>
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-red-600 animate-pulse" />
-            <span className="text-navy-700">Urgent Hazard (Immediate Risk)</span>
+            <span className="text-navy-700 dark:text-navy-300">Urgent Citizen Grievance</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-orange-500" />
-            <span className="text-navy-700">High Priority (Severe Issue)</span>
+            <span className="w-3 h-3 rounded-full bg-amber-500" />
+            <span className="text-navy-700 dark:text-navy-300">AI Road Hazard / Pothole</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-blue-600" />
-            <span className="text-navy-700">Medium (Standard Maintenance)</span>
+            <span className="w-3 h-3 rounded-full bg-cyan-500" />
+            <span className="text-navy-700 dark:text-navy-300">Mobile Transit Bus</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-emerald-600" />
-            <span className="text-navy-700">Resolved / Low Impact</span>
+            <span className="w-3 h-3 rounded-full bg-purple-500" />
+            <span className="text-navy-700 dark:text-navy-300">Traffic Congestion Corridor</span>
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { ComplaintStatus, SeverityLevel, VerificationStatus } from '@/types/database';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'outline' | 'secondary';
   status?: ComplaintStatus;
   severity?: SeverityLevel;
   verification?: VerificationStatus;
@@ -62,8 +62,10 @@ export function Badge({ className, variant = 'default', status, severity, verifi
       danger: 'bg-red-50 dark:bg-red-950/70 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800',
       info: 'bg-blue-50 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800',
       neutral: 'bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-navy-300 border-slate-200 dark:border-navy-700',
+      outline: 'bg-transparent border-navy-300 dark:border-navy-700 text-navy-700 dark:text-navy-300',
+      secondary: 'bg-navy-100 dark:bg-navy-800 text-navy-800 dark:text-navy-200 border-navy-200 dark:border-navy-700',
     };
-    badgeStyle = variants[variant];
+    badgeStyle = variants[variant] || variants.default;
   }
 
   return (
