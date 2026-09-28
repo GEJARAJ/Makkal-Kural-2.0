@@ -79,7 +79,8 @@ export function buildXShareUrl(
   representative?: Representative
 ): string {
   const fullText = buildXDraftPetition(complaint, representative);
-  return `https://twitter.com/intent/tweet?text=${encodeURIComponent(fullText)}`;
+  // Using x.com/intent/post (primary) with URL-encoded text
+  return `https://x.com/intent/post?text=${encodeURIComponent(fullText)}`;
 }
 
 export function buildXOfficialReplyUrl(
@@ -90,8 +91,7 @@ export function buildXOfficialReplyUrl(
 }
 
 /**
- * Automates opening the X / Twitter composer:
- * Works seamlessly across Desktop and Mobile without popup-blocker issues.
+ * Direct function to trigger X / Twitter compose window and copy text to clipboard:
  */
 export function openXIntentOrApp(
   complaint: Partial<Complaint> & { reference_number?: string; title?: string; locality?: string; district?: string; state?: string; category?: string; ai_improved_title?: string },
@@ -101,14 +101,23 @@ export function openXIntentOrApp(
 
   const fullText = buildXDraftPetition(complaint, representative);
   const encodedText = encodeURIComponent(fullText);
-  const tweetUrl = `https://twitter.com/intent/tweet?text=${encodedText}`;
+  const postUrl = `https://x.com/intent/post?text=${encodedText}`;
 
-  // Create an invisible link element and click it natively to prevent popup blockers
-  const link = document.createElement('a');
-  link.href = tweetUrl;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  // Copy text to clipboard in background as safeguard
+  if (navigator?.clipboard?.writeText) {
+    navigator.clipboard.writeText(fullText).catch(() => {});
+  }
+
+  // Open X compose directly
+  const win = window.open(postUrl, '_blank', 'noopener,noreferrer');
+  if (!win || win.closed || typeof win.closed === 'undefined') {
+    // If popup blocked, create an invisible anchor and trigger native click
+    const a = document.createElement('a');
+    a.href = postUrl;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
 }

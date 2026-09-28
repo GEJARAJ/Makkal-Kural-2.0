@@ -7,7 +7,7 @@ import { Complaint, ComplaintStatus, ComplaintAttachment } from '@/types/databas
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { buildXShareUrl, buildXOfficialReplyUrl, openXIntentOrApp } from '@/lib/x-share-service';
+import { buildXShareUrl, buildXOfficialReplyUrl, buildXDraftPetition, openXIntentOrApp } from '@/lib/x-share-service';
 import nextDynamic from 'next/dynamic';
 import { formatDate, cn } from '@/lib/utils';
 const ComplaintMap = nextDynamic(
@@ -47,7 +47,8 @@ import {
   Check,
   Sparkles,
   ShieldAlert,
-  ArrowRight
+  ArrowRight,
+  Copy
 } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 
@@ -283,8 +284,9 @@ export default function TrackDetailPage({
   };
 
   const currentStepIdx = getStepIndex(complaint.status);
-  const xShareUrl = buildXShareUrl(complaint);
-  const xReplyUrl = buildXOfficialReplyUrl(complaint);
+  const xShareUrl = buildXShareUrl(complaint, complaint.assigned_representative);
+  const xReplyUrl = buildXOfficialReplyUrl(complaint, complaint.assigned_representative);
+  const [copiedDraft, setCopiedDraft] = useState(false);
 
   // SLA calculations
   const slaDeadline = complaint.sla_deadline ? new Date(complaint.sla_deadline) : null;
@@ -398,11 +400,35 @@ export default function TrackDetailPage({
             href={xShareUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-navy-800 hover:bg-sky-600 text-white border border-navy-700 hover:border-sky-500 transition-all shadow-xs"
+            onClick={() => {
+              const draft = buildXDraftPetition(complaint, complaint.assigned_representative);
+              if (navigator?.clipboard?.writeText) {
+                navigator.clipboard.writeText(draft).catch(() => {});
+              }
+              setCopiedDraft(true);
+              setTimeout(() => setCopiedDraft(false), 3000);
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-500 hover:bg-sky-600 text-white transition-all shadow-xs"
           >
-            <Share2 className="w-3.5 h-3.5 text-sky-400" />
+            <Share2 className="w-3.5 h-3.5" />
             <span>{isTamil ? 'X (Twitter)-ல் பதிவிடுக' : 'Post to X'}</span>
           </a>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const draft = buildXDraftPetition(complaint, complaint.assigned_representative);
+              navigator.clipboard.writeText(draft);
+              setCopiedDraft(true);
+              setTimeout(() => setCopiedDraft(false), 3000);
+            }}
+            className="text-xs border-navy-700 bg-navy-800 text-navy-200 hover:bg-navy-700 hover:text-white"
+          >
+            {copiedDraft ? <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+            {copiedDraft ? (isTamil ? 'நகலெடுக்கப்பட்டது!' : 'Copied!') : (isTamil ? 'மனு உரை நகல்' : 'Copy Draft')}
+          </Button>
 
           {complaint.assigned_representative?.x_handle && (
             <a
