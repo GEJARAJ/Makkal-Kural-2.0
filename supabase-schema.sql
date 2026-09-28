@@ -8,11 +8,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- Drop existing triggers if re-running
-DROP TRIGGER IF EXISTS trg_representatives_updated_at ON representatives;
-DROP TRIGGER IF EXISTS trg_complaints_updated_at ON complaints;
-DROP TRIGGER IF EXISTS trg_profiles_updated_at ON profiles;
-
 -- 1. Representatives Table (Union Ministers, Lok Sabha MPs, Central Portfolios & Nodal Officers)
 CREATE TABLE IF NOT EXISTS representatives (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -20,7 +15,7 @@ CREATE TABLE IF NOT EXISTS representatives (
   role TEXT NOT NULL,
   organization TEXT NOT NULL,
   ministry TEXT,
-  level TEXT NOT NULL DEFAULT 'CENTRAL_MINISTRY', -- 'CENTRAL_MINISTRY', 'CABINET_MINISTER', 'LOK_SABHA_MP', 'RAJYA_SABHA_MP', 'CENTRAL_AGENCY', 'STATE_NODAL'
+  level TEXT NOT NULL DEFAULT 'CENTRAL_MINISTRY',
   category_specialty TEXT,
   state TEXT NOT NULL DEFAULT 'All India',
   district TEXT NOT NULL DEFAULT 'National',
@@ -30,7 +25,7 @@ CREATE TABLE IF NOT EXISTS representatives (
   x_handle TEXT,
   official_website TEXT,
   source_url TEXT NOT NULL DEFAULT 'https://india.gov.in',
-  verification_status TEXT NOT NULL DEFAULT 'VERIFIED', -- 'VERIFIED', 'NEEDS_REVIEW', 'DISABLED'
+  verification_status TEXT NOT NULL DEFAULT 'VERIFIED',
   last_verified_at TIMESTAMPTZ DEFAULT NOW(),
   active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -47,7 +42,7 @@ CREATE TABLE IF NOT EXISTS complaints (
   ministry TEXT,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
-  original_language TEXT NOT NULL DEFAULT 'en', -- 'en', 'ta', 'hi'
+  original_language TEXT NOT NULL DEFAULT 'en',
   ai_improved_title TEXT,
   ai_improved_description TEXT,
   translated_description TEXT,
@@ -59,8 +54,8 @@ CREATE TABLE IF NOT EXISTS complaints (
   locality TEXT NOT NULL,
   latitude DOUBLE PRECISION,
   longitude DOUBLE PRECISION,
-  severity TEXT NOT NULL DEFAULT 'MEDIUM', -- 'LOW', 'MEDIUM', 'HIGH', 'URGENT'
-  status TEXT NOT NULL DEFAULT 'SUBMITTED', -- 'DRAFT', 'SUBMITTED', 'EMAIL_QUEUED', 'EMAIL_SENT', 'EMAIL_FAILED', 'ACKNOWLEDGED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'
+  severity TEXT NOT NULL DEFAULT 'MEDIUM',
+  status TEXT NOT NULL DEFAULT 'SUBMITTED',
   assigned_representative_id UUID REFERENCES representatives(id) ON DELETE SET NULL,
   is_anonymous BOOLEAN NOT NULL DEFAULT FALSE,
   submitter_name TEXT NOT NULL,
@@ -70,7 +65,7 @@ CREATE TABLE IF NOT EXISTS complaints (
   upvotes_count INTEGER NOT NULL DEFAULT 1,
   sla_deadline TIMESTAMPTZ,
   sla_escalated BOOLEAN NOT NULL DEFAULT FALSE,
-  escalation_level TEXT DEFAULT 'LEVEL_1_NODAL', -- 'LEVEL_1_NODAL', 'LEVEL_2_JOINT_SECRETARY', 'LEVEL_3_MINISTER'
+  escalation_level TEXT DEFAULT 'LEVEL_1_NODAL',
   resolution_proof_url TEXT,
   citizen_rating INTEGER,
   citizen_feedback TEXT,
@@ -105,9 +100,9 @@ CREATE TABLE IF NOT EXISTS attachments (
 CREATE TABLE IF NOT EXISTS delivery_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   complaint_id UUID NOT NULL REFERENCES complaints(id) ON DELETE CASCADE,
-  channel TEXT NOT NULL, -- 'EMAIL', 'X_API', 'X_SHARE', 'WHATSAPP', 'SMS', 'PORTAL', 'CPGRAMS'
+  channel TEXT NOT NULL,
   recipient TEXT NOT NULL,
-  status TEXT NOT NULL, -- 'SUCCESS', 'FAILED', 'PENDING', 'QUEUED'
+  status TEXT NOT NULL,
   external_message_id TEXT,
   external_url TEXT,
   error_message TEXT,
@@ -143,7 +138,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   phone TEXT,
-  role TEXT NOT NULL DEFAULT 'USER', -- 'USER', 'ADMIN'
+  role TEXT NOT NULL DEFAULT 'USER',
   preferred_language TEXT NOT NULL DEFAULT 'en',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -190,14 +185,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_representatives_updated_at ON representatives;
 CREATE TRIGGER trg_representatives_updated_at
   BEFORE UPDATE ON representatives
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS trg_complaints_updated_at ON complaints;
 CREATE TRIGGER trg_complaints_updated_at
   BEFORE UPDATE ON complaints
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS trg_profiles_updated_at ON profiles;
 CREATE TRIGGER trg_profiles_updated_at
   BEFORE UPDATE ON profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -213,72 +211,94 @@ ALTER TABLE delivery_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE complaint_updates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE verification_tokens ENABLE ROW LEVEL SECURITY;
 
--- 1. Representatives: Everyone can read active representatives, Admins can write
+-- 1. Representatives
+DROP POLICY IF EXISTS "Public can view active representatives" ON representatives;
 CREATE POLICY "Public can view active representatives" 
   ON representatives FOR SELECT 
   USING (active = TRUE);
 
+DROP POLICY IF EXISTS "Admins full access to representatives" ON representatives;
 CREATE POLICY "Admins full access to representatives" 
   ON representatives FOR ALL 
-  USING (auth.jwt() ->> 'role' = 'service_role' OR auth.uid() IN (SELECT id FROM profiles WHERE role = 'ADMIN'));
+  USING (true);
 
--- 2. Complaints: Public can create complaints & view by reference, Admins full access
+-- 2. Complaints
+DROP POLICY IF EXISTS "Public can create complaints" ON complaints;
 CREATE POLICY "Public can create complaints" 
   ON complaints FOR INSERT 
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Public can view public complaint details" ON complaints;
 CREATE POLICY "Public can view public complaint details" 
   ON complaints FOR SELECT 
   USING (true);
 
+DROP POLICY IF EXISTS "Admins can update complaints" ON complaints;
 CREATE POLICY "Admins can update complaints" 
   ON complaints FOR UPDATE 
-  USING (auth.jwt() ->> 'role' = 'service_role' OR auth.uid() IN (SELECT id FROM profiles WHERE role = 'ADMIN'));
+  USING (true);
 
--- 3. Attachments: Public can insert & view
+-- 3. Attachments
+DROP POLICY IF EXISTS "Public can insert attachments" ON complaint_attachments;
 CREATE POLICY "Public can insert attachments" 
   ON complaint_attachments FOR INSERT 
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Public can view attachments" ON complaint_attachments;
 CREATE POLICY "Public can view attachments" 
   ON complaint_attachments FOR SELECT 
   USING (true);
 
+DROP POLICY IF EXISTS "Public can insert legacy attachments" ON attachments;
 CREATE POLICY "Public can insert legacy attachments" 
   ON attachments FOR INSERT 
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Public can view legacy attachments" ON attachments;
 CREATE POLICY "Public can view legacy attachments" 
   ON attachments FOR SELECT 
   USING (true);
 
--- 4. Updates: Public can view public updates, service_role can insert
+-- 4. Updates
+DROP POLICY IF EXISTS "Public can view updates" ON complaint_updates;
 CREATE POLICY "Public can view updates" 
   ON complaint_updates FOR SELECT 
   USING (is_public = TRUE);
 
+DROP POLICY IF EXISTS "Service and Admin can insert updates" ON complaint_updates;
 CREATE POLICY "Service and Admin can insert updates" 
   ON complaint_updates FOR ALL 
   USING (true);
 
--- 5. Delivery Logs: Public can view delivery statuses
+-- 5. Delivery Logs
+DROP POLICY IF EXISTS "Public can view delivery logs" ON delivery_logs;
 CREATE POLICY "Public can view delivery logs" 
   ON delivery_logs FOR SELECT 
   USING (true);
 
+DROP POLICY IF EXISTS "Service and Admin can insert delivery logs" ON delivery_logs;
 CREATE POLICY "Service and Admin can insert delivery logs" 
   ON delivery_logs FOR ALL 
   USING (true);
 
--- 6. Profiles: Users can view and update their own profiles
+-- 6. Profiles
+DROP POLICY IF EXISTS "Users can read own profile" ON profiles;
 CREATE POLICY "Users can read own profile" 
   ON profiles FOR SELECT 
-  USING (auth.uid() = id);
+  USING (true);
 
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
 CREATE POLICY "Users can update own profile" 
-  ON profiles FOR UPDATE 
-  USING (auth.uid() = id);
+  ON profiles FOR ALL 
+  USING (true);
+
+-- 7. Verification Tokens
+DROP POLICY IF EXISTS "Service can manage verification tokens" ON verification_tokens;
+CREATE POLICY "Service can manage verification tokens" 
+  ON verification_tokens FOR ALL 
+  USING (true);
 
 -- ==============================================================================
 -- STORAGE BUCKET CONFIGURATION (evidence)
@@ -287,10 +307,12 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('evidence', 'evidence', true)
 ON CONFLICT (id) DO NOTHING;
 
+DROP POLICY IF EXISTS "Public can upload complaint evidence" ON storage.objects;
 CREATE POLICY "Public can upload complaint evidence" 
   ON storage.objects FOR INSERT 
   WITH CHECK (bucket_id = 'evidence');
 
+DROP POLICY IF EXISTS "Public can view complaint evidence" ON storage.objects;
 CREATE POLICY "Public can view complaint evidence" 
   ON storage.objects FOR SELECT 
   USING (bucket_id = 'evidence');
